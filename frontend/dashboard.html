@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CryptoTrader Dashboard</title>
+<title>CryptoTrader — Панель управления</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f1117;color:#e2e8f0;min-height:100vh}
 :root{--bg:#0f1117;--card:#1a1d2e;--border:#2d3148;--accent:#6366f1;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;--text:#e2e8f0;--muted:#64748b}
 
-/* Auth */
 #auth{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0f1117 0%,#1a1d2e 100%)}
 .auth-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px;width:400px;box-shadow:0 25px 50px rgba(0,0,0,.5)}
 .auth-card h1{text-align:center;font-size:24px;margin-bottom:8px}
@@ -26,13 +25,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .auth-tab.active{background:var(--card);color:var(--text);border:1px solid var(--border)}
 .auth-error{color:var(--red);font-size:13px;text-align:center;margin-top:12px;display:none}
 
-/* Layout */
 #app{display:none;min-height:100vh}
 .sidebar{width:240px;background:var(--card);border-right:1px solid var(--border);position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;padding:20px 0;z-index:100}
 .logo{padding:0 20px 24px;border-bottom:1px solid var(--border);font-size:18px;font-weight:700;color:var(--accent)}
 .logo span{color:var(--text)}
 .nav{padding:16px 12px;flex:1}
-.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:14px;color:var(--muted);transition:all .2s;margin-bottom:4px}
+.nav-section{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:8px 12px 4px;margin-top:8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:14px;color:var(--muted);transition:all .2s;margin-bottom:2px}
 .nav-item:hover{background:#232640;color:var(--text)}
 .nav-item.active{background:rgba(99,102,241,.15);color:var(--accent)}
 .nav-item .icon{font-size:16px;width:20px;text-align:center}
@@ -43,25 +42,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .page{display:none}
 .page.active{display:block}
 
-/* Header */
 .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
 .page-title{font-size:22px;font-weight:700}
 .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600}
 .badge-green{background:rgba(16,185,129,.15);color:var(--green)}
 .badge-red{background:rgba(239,68,68,.15);color:var(--red)}
-.badge-yellow{background:rgba(245,158,11,.15);color:var(--yellow)}
-.badge-blue{background:rgba(99,102,241,.15);color:var(--accent)}
 
-/* Cards */
 .cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:28px}
 .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
 .card-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
 .card-value{font-size:28px;font-weight:700}
 .card-value.green{color:var(--green)}
 .card-value.red{color:var(--red)}
-.card-sub{font-size:12px;color:var(--muted);margin-top:4px}
 
-/* Tables */
 .table-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:24px}
 .table-card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
 .table-card-title{font-size:15px;font-weight:600}
@@ -71,94 +64,106 @@ th{padding:10px 20px;text-align:left;font-size:12px;color:var(--muted);text-tran
 td{padding:12px 20px;font-size:13px;border-bottom:1px solid var(--border)}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:rgba(255,255,255,.02)}
-.td-mono{font-family:'Courier New',monospace;font-size:12px}
 
-/* Misc */
 .empty{text-align:center;padding:48px;color:var(--muted);font-size:14px}
 .refresh-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;transition:all .2s}
 .refresh-btn:hover{border-color:var(--accent);color:var(--accent)}
 .logout-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;width:100%;transition:all .2s}
 .logout-btn:hover{border-color:var(--red);color:var(--red)}
-.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
 .tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
-.tag-long{background:rgba(16,185,129,.15);color:var(--green)}
-.tag-short{background:rgba(239,68,68,.15);color:var(--red)}
-.tag-buy{background:rgba(16,185,129,.15);color:var(--green)}
-.tag-sell{background:rgba(239,68,68,.15);color:var(--red)}
-.tag-open{background:rgba(99,102,241,.15);color:var(--accent)}
-.tag-filled{background:rgba(16,185,129,.15);color:var(--green)}
-.tag-cancelled{background:rgba(100,116,139,.15);color:var(--muted)}
-.tag-approve{background:rgba(16,185,129,.15);color:var(--green)}
-.tag-reject{background:rgba(239,68,68,.15);color:var(--red)}
-.tag-paper{background:rgba(245,158,11,.15);color:var(--yellow)}
+.tag-long,.tag-buy,.tag-approve{background:rgba(16,185,129,.15);color:var(--green)}
+.tag-short,.tag-sell,.tag-reject,.tag-critical{background:rgba(239,68,68,.15);color:var(--red)}
+.tag-open,.tag-blue{background:rgba(99,102,241,.15);color:var(--accent)}
+.tag-filled,.tag-active{background:rgba(16,185,129,.15);color:var(--green)}
+.tag-cancelled,.tag-inactive,.tag-info{background:rgba(100,116,139,.15);color:var(--muted)}
+.tag-paper,.tag-pending,.tag-warning{background:rgba(245,158,11,.15);color:var(--yellow)}
 
-/* Form */
-.form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:16px}
+.form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px;align-items:end}
+.input-group{display:flex;flex-direction:column;gap:6px}
+.input-group label{font-size:12px;color:var(--muted)}
 .input-field{background:#0f1117;border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;outline:none;width:100%;transition:border-color .2s}
 .input-field:focus{border-color:var(--accent)}
 select.input-field option{background:var(--card)}
-.btn-sm{padding:8px 16px;border-radius:6px;border:none;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-sm{padding:10px 16px;border-radius:6px;border:none;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
 .btn-sm-primary{background:var(--accent);color:#fff}
 .btn-sm-primary:hover{background:#4f46e5}
+.btn-sm-danger{background:transparent;border:1px solid var(--red);color:var(--red)}
+.btn-sm-danger:hover{background:rgba(239,68,68,.1)}
 
-/* Toast */
+.settings-section{margin-bottom:32px}
+.settings-title{font-size:16px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.settings-row:last-child{border-bottom:none}
+.settings-label{font-size:14px}
+.settings-desc{font-size:12px;color:var(--muted);margin-top:2px}
+.toggle{width:44px;height:24px;background:var(--border);border-radius:12px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.toggle.on{background:var(--accent)}
+.toggle::after{content:'';width:18px;height:18px;background:#fff;border-radius:50%;position:absolute;top:3px;left:3px;transition:left .2s}
+.toggle.on::after{left:23px}
+
 #toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;opacity:0;transition:opacity .3s;z-index:9999}
 #toast.show{opacity:1}
 #toast.success{background:var(--green);color:#fff}
 #toast.error{background:var(--red);color:#fff}
+#toast.info{background:var(--accent);color:#fff}
 </style>
 </head>
 <body>
 
-<!-- Auth -->
+<!-- Авторизация -->
 <div id="auth">
   <div class="auth-card">
     <h1>₿ CryptoTrader</h1>
-    <p>Professional crypto trading platform</p>
+    <p>Профессиональная платформа для торговли</p>
     <div class="auth-tabs">
-      <div class="auth-tab active" onclick="setTab('login')">Login</div>
-      <div class="auth-tab" onclick="setTab('register')">Register</div>
+      <div class="auth-tab active" onclick="setTab('login')">Войти</div>
+      <div class="auth-tab" onclick="setTab('register')">Регистрация</div>
     </div>
     <div id="form-login">
       <div class="form-group"><label>Email</label><input type="email" id="login-email" placeholder="you@example.com"></div>
-      <div class="form-group"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••"></div>
-      <button class="btn btn-primary" onclick="doLogin()">🔐 Sign In</button>
+      <div class="form-group"><label>Пароль</label><input type="password" id="login-pass" placeholder="••••••••"></div>
+      <button class="btn btn-primary" onclick="doLogin()">🔐 Войти</button>
     </div>
     <div id="form-register" style="display:none">
       <div class="form-group"><label>Email</label><input type="email" id="reg-email" placeholder="you@example.com"></div>
-      <div class="form-group"><label>Password</label><input type="password" id="reg-pass" placeholder="min 8 chars"></div>
-      <button class="btn btn-primary" onclick="doRegister()">🚀 Create Account</button>
+      <div class="form-group"><label>Пароль</label><input type="password" id="reg-pass" placeholder="минимум 8 символов"></div>
+      <button class="btn btn-primary" onclick="doRegister()">🚀 Создать аккаунт</button>
     </div>
     <div id="auth-error" class="auth-error"></div>
   </div>
 </div>
 
-<!-- App -->
+<!-- Приложение -->
 <div id="app">
   <div class="sidebar">
     <div class="logo">💹 Crypto<span>Trader</span></div>
     <div class="nav">
-      <div class="nav-item active" onclick="showPage('dashboard')">
-        <span class="icon">📊</span> Dashboard
+      <div class="nav-section">Обзор</div>
+      <div class="nav-item active" onclick="showPage('dashboard',this)">
+        <span class="icon">📊</span> Дашборд
       </div>
-      <div class="nav-item" onclick="showPage('portfolio')">
-        <span class="icon">💰</span> Portfolio
+      <div class="nav-item" onclick="showPage('portfolio',this)">
+        <span class="icon">💰</span> Портфолио
       </div>
-      <div class="nav-item" onclick="showPage('positions')">
-        <span class="icon">📈</span> Positions
+      <div class="nav-item" onclick="showPage('positions',this)">
+        <span class="icon">📈</span> Позиции
       </div>
-      <div class="nav-item" onclick="showPage('orders')">
-        <span class="icon">📋</span> Orders
+      <div class="nav-section">Торговля</div>
+      <div class="nav-item" onclick="showPage('orders',this)">
+        <span class="icon">📋</span> Ордера
       </div>
-      <div class="nav-item" onclick="showPage('signals')">
-        <span class="icon">⚡</span> Signals
+      <div class="nav-item" onclick="showPage('signals',this)">
+        <span class="icon">⚡</span> Сигналы
       </div>
-      <div class="nav-item" onclick="showPage('exchanges')">
-        <span class="icon">🏛️</span> Exchanges
+      <div class="nav-section">Система</div>
+      <div class="nav-item" onclick="showPage('exchanges',this)">
+        <span class="icon">🏛️</span> Биржи
       </div>
-      <div class="nav-item" onclick="showPage('risk')">
-        <span class="icon">🛡️</span> Risk
+      <div class="nav-item" onclick="showPage('risk',this)">
+        <span class="icon">🛡️</span> Риск-менеджмент
+      </div>
+      <div class="nav-item" onclick="showPage('settings',this)">
+        <span class="icon">⚙️</span> Настройки
       </div>
     </div>
     <div class="nav-bottom">
@@ -167,200 +172,322 @@ select.input-field option{background:var(--card)}
         <div><div id="user-email" style="font-size:12px">user@example.com</div>
         <div id="user-role" style="font-size:11px;color:var(--muted)">admin</div></div>
       </div>
-      <button class="logout-btn" onclick="logout()" style="margin-top:8px">🚪 Sign out</button>
+      <button class="logout-btn" onclick="logout()" style="margin-top:8px">🚪 Выйти</button>
     </div>
   </div>
 
   <div class="main">
-    <!-- Dashboard -->
+
+    <!-- Дашборд -->
     <div class="page active" id="page-dashboard">
       <div class="page-header">
-        <div class="page-title">📊 Dashboard</div>
-        <button class="refresh-btn" onclick="loadDashboard()">↻ Refresh</button>
+        <div class="page-title">📊 Дашборд</div>
+        <button class="refresh-btn" onclick="loadDashboard()">↻ Обновить</button>
       </div>
-      <div class="cards-grid" id="summary-cards">
-        <div class="card"><div class="card-label">Total Equity</div><div class="card-value" id="s-equity">$0</div></div>
-        <div class="card"><div class="card-label">Unrealized PnL</div><div class="card-value" id="s-upnl">$0</div></div>
-        <div class="card"><div class="card-label">Realized PnL (day)</div><div class="card-value" id="s-rpnl">$0</div></div>
-        <div class="card"><div class="card-label">Open Positions</div><div class="card-value" id="s-pos">0</div></div>
-        <div class="card"><div class="card-label">Active Exchanges</div><div class="card-value" id="s-exc">0</div></div>
+      <div class="cards-grid">
+        <div class="card"><div class="card-label">Общий баланс</div><div class="card-value" id="s-equity">$0</div></div>
+        <div class="card"><div class="card-label">Нереализованный PnL</div><div class="card-value" id="s-upnl">$0</div></div>
+        <div class="card"><div class="card-label">Реализованный PnL (день)</div><div class="card-value" id="s-rpnl">$0</div></div>
+        <div class="card"><div class="card-label">Открытых позиций</div><div class="card-value" id="s-pos">0</div></div>
+        <div class="card"><div class="card-label">Активных бирж</div><div class="card-value" id="s-exc">0</div></div>
       </div>
       <div class="table-card">
-        <div class="table-card-header"><div class="table-card-title">📋 Recent Orders</div></div>
+        <div class="table-card-header"><div class="table-card-title">📋 Последние ордера</div></div>
         <div class="table-wrap"><table>
-          <thead><tr><th>Symbol</th><th>Side</th><th>Type</th><th>Qty</th><th>Price</th><th>Status</th><th>Time</th></tr></thead>
-          <tbody id="dash-orders"><tr><td colspan="7" class="empty">Loading...</td></tr></tbody>
+          <thead><tr><th>Пара</th><th>Сторона</th><th>Тип</th><th>Количество</th><th>Цена</th><th>Статус</th><th>Время</th></tr></thead>
+          <tbody id="dash-orders"><tr><td colspan="7" class="empty">Загрузка...</td></tr></tbody>
         </table></div>
       </div>
       <div class="table-card">
-        <div class="table-card-header"><div class="table-card-title">⚡ Recent Signals</div></div>
+        <div class="table-card-header"><div class="table-card-title">⚡ Последние сигналы</div></div>
         <div class="table-wrap"><table>
-          <thead><tr><th>Symbol</th><th>Direction</th><th>Entry</th><th>SL</th><th>Score</th><th>Decision</th><th>Time</th></tr></thead>
-          <tbody id="dash-signals"><tr><td colspan="7" class="empty">Loading...</td></tr></tbody>
+          <thead><tr><th>Пара</th><th>Направление</th><th>Вход</th><th>Стоп</th><th>Оценка</th><th>Решение</th><th>Время</th></tr></thead>
+          <tbody id="dash-signals"><tr><td colspan="7" class="empty">Загрузка...</td></tr></tbody>
         </table></div>
       </div>
     </div>
 
-    <!-- Portfolio -->
+    <!-- Портфолио -->
     <div class="page" id="page-portfolio">
       <div class="page-header">
-        <div class="page-title">💰 Portfolio</div>
-        <button class="refresh-btn" onclick="loadPortfolio()">↻ Refresh</button>
+        <div class="page-title">💰 Портфолио</div>
+        <button class="refresh-btn" onclick="loadPortfolio()">↻ Обновить</button>
       </div>
       <div class="table-card">
-        <div class="table-card-header"><div class="table-card-title">Balances</div></div>
+        <div class="table-card-header"><div class="table-card-title">Балансы</div></div>
         <div class="table-wrap"><table>
-          <thead><tr><th>Exchange</th><th>Currency</th><th>Total</th><th>Available</th><th>Locked</th><th>Updated</th></tr></thead>
-          <tbody id="balances-table"><tr><td colspan="6" class="empty">Loading...</td></tr></tbody>
+          <thead><tr><th>Биржа</th><th>Валюта</th><th>Всего</th><th>Доступно</th><th>Заблокировано</th><th>Обновлено</th></tr></thead>
+          <tbody id="balances-table"><tr><td colspan="6" class="empty">Загрузка...</td></tr></tbody>
         </table></div>
       </div>
       <div class="table-card">
-        <div class="table-card-header"><div class="table-card-title">PnL History (snapshots)</div></div>
+        <div class="table-card-header"><div class="table-card-title">История PnL</div></div>
         <div class="table-wrap"><table>
-          <thead><tr><th>Time</th><th>Total Equity</th><th>Unrealized PnL</th><th>Realized PnL</th></tr></thead>
-          <tbody id="snapshots-table"><tr><td colspan="4" class="empty">No snapshots yet</td></tr></tbody>
+          <thead><tr><th>Время</th><th>Общий баланс</th><th>Нереализованный PnL</th><th>Реализованный PnL</th></tr></thead>
+          <tbody id="snapshots-table"><tr><td colspan="4" class="empty">Нет снапшотов</td></tr></tbody>
         </table></div>
       </div>
     </div>
 
-    <!-- Positions -->
+    <!-- Позиции -->
     <div class="page" id="page-positions">
       <div class="page-header">
-        <div class="page-title">📈 Open Positions</div>
-        <button class="refresh-btn" onclick="loadPositions()">↻ Refresh</button>
+        <div class="page-title">📈 Открытые позиции</div>
+        <button class="refresh-btn" onclick="loadPositions()">↻ Обновить</button>
       </div>
       <div class="table-card">
         <div class="table-wrap"><table>
-          <thead><tr><th>Exchange</th><th>Symbol</th><th>Side</th><th>Qty</th><th>Entry</th><th>Leverage</th><th>PnL</th><th>Liq. Price</th><th>Opened</th></tr></thead>
-          <tbody id="positions-table"><tr><td colspan="9" class="empty">Loading...</td></tr></tbody>
+          <thead><tr><th>Биржа</th><th>Пара</th><th>Сторона</th><th>Кол-во</th><th>Цена входа</th><th>Плечо</th><th>PnL</th><th>Ликвидация</th><th>Открыта</th></tr></thead>
+          <tbody id="positions-table"><tr><td colspan="9" class="empty">Загрузка...</td></tr></tbody>
         </table></div>
       </div>
     </div>
 
-    <!-- Orders -->
+    <!-- Ордера -->
     <div class="page" id="page-orders">
       <div class="page-header">
-        <div class="page-title">📋 Orders</div>
-        <button class="refresh-btn" onclick="loadOrders()">↻ Refresh</button>
+        <div class="page-title">📋 Ордера</div>
+        <button class="refresh-btn" onclick="loadOrders()">↻ Обновить</button>
       </div>
       <div class="card" style="margin-bottom:20px">
-        <div style="font-size:14px;font-weight:600;margin-bottom:16px">➕ New Manual Order</div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:16px">➕ Создать ордер вручную</div>
         <div class="form-row">
-          <select class="input-field" id="order-exchange"><option value="">Select Exchange...</option></select>
-          <input class="input-field" id="order-symbol" placeholder="BTC/USDT">
-          <select class="input-field" id="order-side"><option value="buy">Buy</option><option value="sell">Sell</option></select>
-          <select class="input-field" id="order-type"><option value="market">Market</option><option value="limit">Limit</option></select>
-          <input class="input-field" id="order-qty" type="number" placeholder="Quantity">
-          <input class="input-field" id="order-price" type="number" placeholder="Price (limit only)">
-          <button class="btn-sm btn-sm-primary" onclick="createOrder()">Place Order</button>
+          <div class="input-group"><label>Биржа</label><select class="input-field" id="order-exchange"><option value="">Выберите биржу...</option></select></div>
+          <div class="input-group"><label>Торговая пара</label><input class="input-field" id="order-symbol" placeholder="BTC/USDT"></div>
+          <div class="input-group"><label>Сторона</label><select class="input-field" id="order-side"><option value="buy">Покупка</option><option value="sell">Продажа</option></select></div>
+          <div class="input-group"><label>Тип</label><select class="input-field" id="order-type"><option value="market">Рыночный</option><option value="limit">Лимитный</option></select></div>
+          <div class="input-group"><label>Количество</label><input class="input-field" id="order-qty" type="number" placeholder="0.001"></div>
+          <div class="input-group"><label>Цена (лимит)</label><input class="input-field" id="order-price" type="number" placeholder="0"></div>
+          <div class="input-group"><label>&nbsp;</label><button class="btn-sm btn-sm-primary" onclick="createOrder()">Разместить ордер</button></div>
         </div>
       </div>
       <div class="table-card">
         <div class="table-wrap"><table>
-          <thead><tr><th>Symbol</th><th>Side</th><th>Type</th><th>Qty</th><th>Price</th><th>Status</th><th>Source</th><th>Time</th></tr></thead>
-          <tbody id="orders-table"><tr><td colspan="8" class="empty">Loading...</td></tr></tbody>
+          <thead><tr><th>Пара</th><th>Сторона</th><th>Тип</th><th>Количество</th><th>Цена</th><th>Статус</th><th>Источник</th><th>Время</th></tr></thead>
+          <tbody id="orders-table"><tr><td colspan="8" class="empty">Загрузка...</td></tr></tbody>
         </table></div>
       </div>
     </div>
 
-    <!-- Signals -->
+    <!-- Сигналы -->
     <div class="page" id="page-signals">
       <div class="page-header">
-        <div class="page-title">⚡ Signals</div>
-        <button class="refresh-btn" onclick="loadSignals()">↻ Refresh</button>
+        <div class="page-title">⚡ Сигналы</div>
+        <button class="refresh-btn" onclick="loadSignals()">↻ Обновить</button>
       </div>
       <div class="table-card">
-        <div class="table-card-header"><div class="table-card-title">Signal Feed</div></div>
+        <div class="table-card-header"><div class="table-card-title">Лента сигналов</div></div>
         <div class="table-wrap"><table>
-          <thead><tr><th>Symbol</th><th>Direction</th><th>Entry</th><th>Stop Loss</th><th>TPs</th><th>Leverage</th><th>Score</th><th>Decision</th><th>Time</th></tr></thead>
-          <tbody id="signals-table"><tr><td colspan="9" class="empty">Loading...</td></tr></tbody>
+          <thead><tr><th>Пара</th><th>Направление</th><th>Вход</th><th>Стоп-лосс</th><th>Тейк-профиты</th><th>Плечо</th><th>Оценка</th><th>Решение</th><th>Время</th></tr></thead>
+          <tbody id="signals-table"><tr><td colspan="9" class="empty">Загрузка...</td></tr></tbody>
         </table></div>
       </div>
       <div class="table-card">
-        <div class="table-card-header"><div class="table-card-title">🏆 Source Leaderboard</div></div>
+        <div class="table-card-header"><div class="table-card-title">🏆 Таблица лидеров источников</div></div>
         <div class="table-wrap"><table>
-          <thead><tr><th>#</th><th>Source</th><th>Win Rate</th><th>Signals</th><th>Quality Score</th><th>Paper Only</th></tr></thead>
-          <tbody id="leaderboard-table"><tr><td colspan="6" class="empty">No sources yet</td></tr></tbody>
+          <thead><tr><th>#</th><th>Источник</th><th>Процент побед</th><th>Сигналов</th><th>Качество</th><th>Режим</th></tr></thead>
+          <tbody id="leaderboard-table"><tr><td colspan="6" class="empty">Нет источников</td></tr></tbody>
         </table></div>
       </div>
     </div>
 
-    <!-- Exchanges -->
+    <!-- Биржи -->
     <div class="page" id="page-exchanges">
       <div class="page-header">
-        <div class="page-title">🏛️ Exchanges</div>
-        <button class="refresh-btn" onclick="loadExchanges()">↻ Refresh</button>
+        <div class="page-title">🏛️ Биржи</div>
+        <button class="refresh-btn" onclick="loadExchanges()">↻ Обновить</button>
       </div>
       <div class="card" style="margin-bottom:20px">
-        <div style="font-size:14px;font-weight:600;margin-bottom:16px">➕ Add Exchange</div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:16px">➕ Подключить биржу</div>
         <div class="form-row">
-          <select class="input-field" id="exc-name">
-            <option value="binance">Binance</option>
-            <option value="bybit">Bybit</option>
-            <option value="okx">OKX</option>
-            <option value="gate">Gate.io</option>
-            <option value="kucoin">KuCoin</option>
-          </select>
-          <button class="btn-sm btn-sm-primary" onclick="addExchange()">Add Exchange</button>
-        </div>
-      </div>
-      <div class="card" style="margin-bottom:20px">
-        <div style="font-size:14px;font-weight:600;margin-bottom:16px">🔑 Add API Keys</div>
-        <div class="form-row">
-          <select class="input-field" id="cred-exchange"><option value="">Select Exchange...</option></select>
-          <input class="input-field" id="cred-key" placeholder="API Key">
-          <input class="input-field" id="cred-secret" type="password" placeholder="API Secret">
-          <button class="btn-sm btn-sm-primary" onclick="addCredential()">Save Keys</button>
+          <div class="input-group"><label>Биржа</label>
+            <select class="input-field" id="exc-name">
+              <option value="binance">Binance</option>
+              <option value="bybit">Bybit</option>
+              <option value="okx">OKX</option>
+              <option value="gate">Gate.io</option>
+              <option value="kucoin">KuCoin</option>
+              <option value="mexc">MEXC</option>
+              <option value="bitget">Bitget</option>
+            </select>
+          </div>
+          <div class="input-group"><label>&nbsp;</label><button class="btn-sm btn-sm-primary" onclick="addExchange()">Добавить биржу</button></div>
         </div>
       </div>
       <div class="table-card">
-        <div class="table-card-header"><div class="table-card-title">Connected Exchanges</div></div>
+        <div class="table-card-header"><div class="table-card-title">Подключённые биржи</div></div>
         <div class="table-wrap"><table>
-          <thead><tr><th>Name</th><th>Adapter</th><th>Status</th><th>Added</th></tr></thead>
-          <tbody id="exchanges-table"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody>
+          <thead><tr><th>Название</th><th>Адаптер</th><th>Статус</th><th>Добавлена</th></tr></thead>
+          <tbody id="exchanges-table"><tr><td colspan="4" class="empty">Загрузка...</td></tr></tbody>
         </table></div>
       </div>
+      <div class="card" style="margin-bottom:20px">
+        <div style="font-size:14px;font-weight:600;margin-bottom:16px">🔑 Добавить API-ключи</div>
+        <div class="form-row">
+          <div class="input-group"><label>Биржа</label><select class="input-field" id="cred-exchange"><option value="">Выберите биржу...</option></select></div>
+          <div class="input-group"><label>API Key</label><input class="input-field" id="cred-key" placeholder="Вставьте API ключ"></div>
+          <div class="input-group"><label>API Secret</label><input class="input-field" id="cred-secret" type="password" placeholder="Вставьте секретный ключ"></div>
+          <div class="input-group"><label>&nbsp;</label><button class="btn-sm btn-sm-primary" onclick="addCredential()">Сохранить ключи</button></div>
+        </div>
+      </div>
       <div class="table-card">
-        <div class="table-card-header"><div class="table-card-title">API Keys</div></div>
+        <div class="table-card-header"><div class="table-card-title">API-ключи</div></div>
         <div class="table-wrap"><table>
-          <thead><tr><th>Exchange</th><th>Verified</th><th>Added</th></tr></thead>
-          <tbody id="creds-table"><tr><td colspan="3" class="empty">No API keys configured</td></tr></tbody>
+          <thead><tr><th>Биржа</th><th>Верификация</th><th>Добавлены</th></tr></thead>
+          <tbody id="creds-table"><tr><td colspan="3" class="empty">API-ключи не добавлены</td></tr></tbody>
         </table></div>
       </div>
     </div>
 
-    <!-- Risk -->
+    <!-- Риск-менеджмент -->
     <div class="page" id="page-risk">
       <div class="page-header">
-        <div class="page-title">🛡️ Risk Management</div>
-        <button class="refresh-btn" onclick="loadRisk()">↻ Refresh</button>
+        <div class="page-title">🛡️ Риск-менеджмент</div>
+        <button class="refresh-btn" onclick="loadRisk()">↻ Обновить</button>
       </div>
       <div class="table-card">
-        <div class="table-card-header"><div class="table-card-title">Risk Events</div></div>
+        <div class="table-card-header"><div class="table-card-title">События рисков</div></div>
         <div class="table-wrap"><table>
-          <thead><tr><th>Type</th><th>Severity</th><th>Component</th><th>Resolved</th><th>Time</th><th>Action</th></tr></thead>
-          <tbody id="risk-table"><tr><td colspan="6" class="empty">No risk events</td></tr></tbody>
+          <thead><tr><th>Тип</th><th>Уровень</th><th>Компонент</th><th>Решено</th><th>Время</th><th>Действие</th></tr></thead>
+          <tbody id="risk-table"><tr><td colspan="6" class="empty">Нет событий</td></tr></tbody>
         </table></div>
       </div>
       <div class="table-card">
-        <div class="table-card-header"><div class="table-card-title">Risk Configuration</div></div>
+        <div class="table-card-header"><div class="table-card-title">Конфигурация рисков</div></div>
         <div class="table-wrap"><table>
-          <thead><tr><th>Scope</th><th>Parameter</th><th>Value</th><th>Updated</th></tr></thead>
-          <tbody id="riskconfig-table"><tr><td colspan="4" class="empty">No risk config</td></tr></tbody>
+          <thead><tr><th>Область</th><th>Параметр</th><th>Значение</th><th>Обновлено</th></tr></thead>
+          <tbody id="riskconfig-table"><tr><td colspan="4" class="empty">Нет конфигурации</td></tr></tbody>
         </table></div>
       </div>
     </div>
+
+    <!-- Настройки -->
+    <div class="page" id="page-settings">
+      <div class="page-header">
+        <div class="page-title">⚙️ Настройки</div>
+      </div>
+
+      <div class="cards-grid" style="margin-bottom:24px">
+        <div class="card">
+          <div class="card-label">Аккаунт</div>
+          <div style="font-size:16px;font-weight:600;margin:8px 0 4px" id="settings-email">—</div>
+          <div style="font-size:12px;color:var(--muted)" id="settings-role">—</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Версия API</div>
+          <div style="font-size:16px;font-weight:600;margin:8px 0 4px">v1.0.0</div>
+          <div style="font-size:12px;color:var(--green)">✓ Подключено</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Документация API</div>
+          <div style="margin-top:12px">
+            <a href="/docs" target="_blank" style="color:var(--accent);font-size:13px;text-decoration:none">📖 Открыть Swagger UI →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Смена пароля -->
+      <div class="table-card settings-section" style="padding:20px">
+        <div class="settings-title">🔒 Безопасность</div>
+        <div class="form-row" style="max-width:600px">
+          <div class="input-group"><label>Текущий пароль</label><input class="input-field" type="password" id="cur-pass" placeholder="••••••••"></div>
+          <div class="input-group"><label>Новый пароль</label><input class="input-field" type="password" id="new-pass" placeholder="минимум 8 символов"></div>
+          <div class="input-group"><label>&nbsp;</label><button class="btn-sm btn-sm-primary" onclick="toast('Смена пароля будет добавлена в следующей версии','info')">Изменить пароль</button></div>
+        </div>
+      </div>
+
+      <!-- Настройки бирж -->
+      <div class="table-card" style="padding:20px;margin-bottom:24px">
+        <div class="settings-title">🏛️ Настройки бирж</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Добавьте API-ключи ваших бирж для торговли. Ключи хранятся в зашифрованном виде.</p>
+
+        <div style="margin-bottom:20px">
+          <div style="font-size:13px;font-weight:600;margin-bottom:12px;color:var(--muted)">Поддерживаемые биржи</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px" id="supported-exchanges">
+            <span class="tag tag-blue">Binance</span>
+            <span class="tag tag-blue">Bybit</span>
+            <span class="tag tag-blue">OKX</span>
+            <span class="tag tag-blue">Gate.io</span>
+            <span class="tag tag-blue">KuCoin</span>
+            <span class="tag tag-blue">MEXC</span>
+            <span class="tag tag-blue">Bitget</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="input-group"><label>Биржа</label>
+            <select class="input-field" id="settings-exc-name">
+              <option value="binance">Binance</option>
+              <option value="bybit">Bybit</option>
+              <option value="okx">OKX</option>
+              <option value="gate">Gate.io</option>
+              <option value="kucoin">KuCoin</option>
+              <option value="mexc">MEXC</option>
+              <option value="bitget">Bitget</option>
+            </select>
+          </div>
+          <div class="input-group"><label>API Key</label><input class="input-field" id="settings-api-key" placeholder="Вставьте API ключ"></div>
+          <div class="input-group"><label>API Secret</label><input class="input-field" type="password" id="settings-api-secret" placeholder="Вставьте секретный ключ"></div>
+          <div class="input-group"><label>&nbsp;</label><button class="btn-sm btn-sm-primary" onclick="settingsAddExchange()">Подключить биржу</button></div>
+        </div>
+
+        <div class="table-wrap" style="margin-top:16px">
+          <table>
+            <thead><tr><th>Биржа</th><th>Статус</th><th>API Key</th><th>Добавлены</th><th></th></tr></thead>
+            <tbody id="settings-creds-table"><tr><td colspan="5" class="empty">Нет подключённых бирж</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Уведомления -->
+      <div class="table-card" style="padding:20px;margin-bottom:24px">
+        <div class="settings-title">🔔 Уведомления</div>
+        <div class="settings-row">
+          <div><div class="settings-label">Уведомления о новых сигналах</div><div class="settings-desc">Получать уведомления при появлении новых торговых сигналов</div></div>
+          <div class="toggle" id="toggle-signals" onclick="toggleSetting(this)"></div>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label">Уведомления об ордерах</div><div class="settings-desc">Получать уведомления при исполнении ордеров</div></div>
+          <div class="toggle on" id="toggle-orders" onclick="toggleSetting(this)"></div>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label">Уведомления о рисках</div><div class="settings-desc">Критические предупреждения от риск-менеджера</div></div>
+          <div class="toggle on" id="toggle-risk" onclick="toggleSetting(this)"></div>
+        </div>
+      </div>
+
+      <!-- Риск-параметры -->
+      <div class="table-card" style="padding:20px;margin-bottom:24px">
+        <div class="settings-title">🛡️ Параметры риска</div>
+        <div class="form-row">
+          <div class="input-group"><label>Макс. риск на сделку (%)</label><input class="input-field" id="risk-per-trade" type="number" value="1" min="0.1" max="10" step="0.1"></div>
+          <div class="input-group"><label>Макс. дневная просадка (%)</label><input class="input-field" id="risk-daily-dd" type="number" value="5" min="1" max="20"></div>
+          <div class="input-group"><label>Макс. одновременных позиций</label><input class="input-field" id="risk-max-pos" type="number" value="20" min="1" max="100"></div>
+          <div class="input-group"><label>Макс. плечо</label><input class="input-field" id="risk-max-lev" type="number" value="10" min="1" max="125"></div>
+          <div class="input-group"><label>&nbsp;</label><button class="btn-sm btn-sm-primary" onclick="saveRiskSettings()">Сохранить параметры</button></div>
+        </div>
+      </div>
+
+      <!-- Опасная зона -->
+      <div class="table-card" style="padding:20px;border-color:rgba(239,68,68,.3)">
+        <div class="settings-title" style="color:var(--red)">⚠️ Опасная зона</div>
+        <div class="settings-row">
+          <div><div class="settings-label">Экстренная остановка торговли</div><div class="settings-desc">Отменить все ордера и закрыть все позиции немедленно</div></div>
+          <button class="btn-sm btn-sm-danger" onclick="emergencyStop()">Аварийная остановка</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <div id="toast"></div>
 
 <script>
-const API = ''  // same origin, or set to 'http://144.124.249.215:8000'
+const API = ''
 let token = localStorage.getItem('ct_token')
 let currentUser = null
 
-// ---- Auth ----
 function setTab(t) {
   document.querySelectorAll('.auth-tab').forEach((el,i)=>el.classList.toggle('active',i===(t==='login'?0:1)))
   document.getElementById('form-login').style.display = t==='login'?'':'none'
@@ -374,7 +501,7 @@ async function api(path, opts={}) {
   const r = await fetch(API+'/api/v1'+path, {...opts, headers:{...headers,...(opts.headers||{})}})
   if(r.status===401){logout();return null}
   const data = await r.json().catch(()=>({}))
-  if(!r.ok) throw new Error(data.detail||'Error '+r.status)
+  if(!r.ok) throw new Error(data.detail||'Ошибка '+r.status)
   return data
 }
 
@@ -388,9 +515,7 @@ async function doLogin() {
     token = data.access_token
     localStorage.setItem('ct_token', token)
     await initApp()
-  } catch(e) {
-    err.textContent = e.message; err.style.display='block'
-  }
+  } catch(e) { err.textContent=e.message; err.style.display='block' }
 }
 
 async function doRegister() {
@@ -399,12 +524,10 @@ async function doRegister() {
   const err = document.getElementById('auth-error')
   try {
     await api('/auth/register',{method:'POST',body:JSON.stringify({email,password:pass})})
-    toast('Account created! Please login.','success')
+    toast('Аккаунт создан! Войдите в систему.','success')
     setTab('login')
     document.getElementById('login-email').value = email
-  } catch(e) {
-    err.textContent = e.message; err.style.display='block'
-  }
+  } catch(e) { err.textContent=e.message; err.style.display='block' }
 }
 
 function logout() {
@@ -419,40 +542,38 @@ async function initApp() {
     currentUser = await api('/auth/me')
     if(!currentUser) return
     document.getElementById('user-email').textContent = currentUser.email
-    document.getElementById('user-role').textContent = currentUser.role
+    document.getElementById('user-role').textContent = currentUser.role === 'admin' ? 'Администратор' : currentUser.role
     document.getElementById('user-avatar').textContent = currentUser.email[0].toUpperCase()
+    document.getElementById('settings-email').textContent = currentUser.email
+    document.getElementById('settings-role').textContent = currentUser.role === 'admin' ? 'Администратор' : currentUser.role
     document.getElementById('auth').style.display='none'
     document.getElementById('app').style.display='block'
     loadDashboard()
-    loadExchanges()  // preload for order form
+    loadExchanges()
   } catch(e) { logout() }
 }
 
-// ---- Navigation ----
-function showPage(name) {
+function showPage(name, el) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'))
   document.getElementById('page-'+name).classList.add('active')
-  event.currentTarget.classList.add('active')
-  const loaders = {dashboard:loadDashboard,portfolio:loadPortfolio,positions:loadPositions,orders:loadOrders,signals:loadSignals,risk:loadRisk}
+  if(el) el.classList.add('active')
+  const loaders = {dashboard:loadDashboard,portfolio:loadPortfolio,positions:loadPositions,orders:loadOrders,signals:loadSignals,risk:loadRisk,exchanges:loadExchanges,settings:loadSettings}
   if(loaders[name]) loaders[name]()
 }
 
-// ---- Utils ----
 function fmt(n,dec=2){return typeof n==='number'?'$'+n.toFixed(dec):'-'}
 function fmtN(n,dec=4){return typeof n==='number'?n.toFixed(dec):'-'}
-function fmtDate(d){if(!d)return '-';const dt=new Date(d);return dt.toLocaleDateString()+' '+dt.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'})}
+function fmtDate(d){if(!d)return '-';const dt=new Date(d);return dt.toLocaleDateString('ru-RU')+' '+dt.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'})}
 function pnlClass(v){return v>0?'green':v<0?'red':''}
 function tag(text,cls){return `<span class="tag tag-${cls}">${text}</span>`}
 function toast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className='show '+type;setTimeout(()=>t.className='',3000)}
+function toggleSetting(el){el.classList.toggle('on')}
 
-// ---- Dashboard ----
 async function loadDashboard() {
   try {
     const [summary, orders, signals] = await Promise.all([
-      api('/portfolio/summary'),
-      api('/orders/?limit=10'),
-      api('/signals/?limit=10')
+      api('/portfolio/summary'), api('/orders/?limit=10'), api('/signals/?limit=10')
     ])
     if(summary) {
       document.getElementById('s-equity').textContent = '$'+summary.total_equity.toFixed(2)
@@ -465,65 +586,55 @@ async function loadDashboard() {
     }
     if(orders) renderOrdersTable('dash-orders', orders)
     if(signals) renderSignalsTable('dash-signals', signals)
-  } catch(e) { console.error(e) }
+  } catch(e){ console.error(e) }
 }
 
-// ---- Portfolio ----
 async function loadPortfolio() {
   try {
     const [balances, snaps] = await Promise.all([api('/portfolio/balances'), api('/portfolio/snapshots?limit=20')])
     const bt = document.getElementById('balances-table')
-    if(!balances||!balances.length){bt.innerHTML='<tr><td colspan="6" class="empty">No balances</td></tr>';return}
+    if(!balances||!balances.length){bt.innerHTML='<tr><td colspan="6" class="empty">Нет балансов</td></tr>';return}
     bt.innerHTML = balances.map(b=>`<tr>
-      <td>${b.exchange_name||b.exchange_id}</td>
-      <td><b>${b.currency}</b></td>
-      <td>${fmtN(b.total,4)}</td>
-      <td>${fmtN(b.available,4)}</td>
-      <td>${fmtN(b.locked,4)}</td>
+      <td>${b.exchange_name||b.exchange_id}</td><td><b>${b.currency}</b></td>
+      <td>${fmtN(b.total,4)}</td><td>${fmtN(b.available,4)}</td><td>${fmtN(b.locked,4)}</td>
       <td style="color:var(--muted)">${fmtDate(b.updated_at)}</td>
     </tr>`).join('')
     const st = document.getElementById('snapshots-table')
-    if(!snaps||!snaps.length){st.innerHTML='<tr><td colspan="4" class="empty">No snapshots yet</td></tr>';return}
+    if(!snaps||!snaps.length){st.innerHTML='<tr><td colspan="4" class="empty">Нет снапшотов</td></tr>';return}
     st.innerHTML = snaps.map(s=>`<tr>
-      <td>${fmtDate(s.timestamp)}</td>
-      <td>$${s.total_equity.toFixed(2)}</td>
+      <td>${fmtDate(s.timestamp)}</td><td>$${s.total_equity.toFixed(2)}</td>
       <td class="${pnlClass(s.unrealized_pnl)}">$${s.unrealized_pnl.toFixed(2)}</td>
       <td class="${pnlClass(s.realized_pnl_day)}">$${s.realized_pnl_day.toFixed(2)}</td>
     </tr>`).join('')
-  } catch(e) { console.error(e) }
+  } catch(e){ console.error(e) }
 }
 
-// ---- Positions ----
 async function loadPositions() {
-  try {
-    const data = await api('/portfolio/positions')
-    const tb = document.getElementById('positions-table')
-    if(!data||!data.length){tb.innerHTML='<tr><td colspan="9" class="empty">No open positions</td></tr>';return}
-    tb.innerHTML = data.map(p=>`<tr>
-      <td>${p.exchange_name||p.exchange_id}</td>
-      <td><b>${p.symbol}</b></td>
-      <td>${tag(p.side,p.side)}</td>
-      <td>${fmtN(p.quantity)}</td>
-      <td>$${fmtN(p.entry_price)}</td>
-      <td>${p.leverage}x</td>
-      <td class="${pnlClass(p.unrealized_pnl)}">$${p.unrealized_pnl.toFixed(2)}</td>
-      <td>${p.liquidation_price?'$'+fmtN(p.liquidation_price):'-'}</td>
-      <td style="color:var(--muted)">${fmtDate(p.opened_at)}</td>
-    </tr>`).join('')
-  } catch(e) { console.error(e) }
+  const data = await api('/portfolio/positions')
+  const tb = document.getElementById('positions-table')
+  if(!data||!data.length){tb.innerHTML='<tr><td colspan="9" class="empty">Нет открытых позиций</td></tr>';return}
+  tb.innerHTML = data.map(p=>`<tr>
+    <td>${p.exchange_name||p.exchange_id}</td><td><b>${p.symbol}</b></td>
+    <td>${tag(p.side==='long'?'Лонг':'Шорт',p.side)}</td>
+    <td>${fmtN(p.quantity)}</td><td>$${fmtN(p.entry_price)}</td><td>${p.leverage}x</td>
+    <td class="${pnlClass(p.unrealized_pnl)}">$${p.unrealized_pnl.toFixed(2)}</td>
+    <td>${p.liquidation_price?'$'+fmtN(p.liquidation_price):'-'}</td>
+    <td style="color:var(--muted)">${fmtDate(p.opened_at)}</td>
+  </tr>`).join('')
 }
 
-// ---- Orders ----
 function renderOrdersTable(id, orders) {
   const tb = document.getElementById(id)
-  if(!orders||!orders.length){tb.innerHTML='<tr><td colspan="8" class="empty">No orders</td></tr>';return}
+  if(!orders||!orders.length){tb.innerHTML='<tr><td colspan="8" class="empty">Нет ордеров</td></tr>';return}
+  const sides = {buy:'Покупка',sell:'Продажа'}
+  const types = {market:'Рыночный',limit:'Лимитный'}
+  const statuses = {open:'Открыт',filled:'Исполнен',cancelled:'Отменён',pending:'В обработке'}
   tb.innerHTML = orders.map(o=>`<tr>
     <td><b>${o.symbol}</b></td>
-    <td>${tag(o.side,o.side)}</td>
-    <td>${o.order_type}</td>
-    <td>${fmtN(o.quantity)}</td>
-    <td>${o.price?'$'+fmtN(o.price):'-'}</td>
-    <td>${tag(o.status,o.status)}</td>
+    <td>${tag(sides[o.side]||o.side,o.side)}</td>
+    <td>${types[o.order_type]||o.order_type}</td>
+    <td>${fmtN(o.quantity)}</td><td>${o.price?'$'+fmtN(o.price):'-'}</td>
+    <td>${tag(statuses[o.status]||o.status,o.status)}</td>
     <td style="color:var(--muted)">${fmtDate(o.created_at)}</td>
   </tr>`).join('')
 }
@@ -531,15 +642,18 @@ function renderOrdersTable(id, orders) {
 async function loadOrders() {
   const data = await api('/orders/?limit=100')
   const tb = document.getElementById('orders-table')
-  if(!data||!data.length){tb.innerHTML='<tr><td colspan="8" class="empty">No orders yet</td></tr>';return}
+  if(!data||!data.length){tb.innerHTML='<tr><td colspan="8" class="empty">Нет ордеров</td></tr>';return}
+  const sides = {buy:'Покупка',sell:'Продажа'}
+  const types = {market:'Рыночный',limit:'Лимитный'}
+  const statuses = {open:'Открыт',filled:'Исполнен',cancelled:'Отменён',pending:'В обработке'}
+  const sources = {manual:'Вручную',signal:'Сигнал',strategy:'Стратегия'}
   tb.innerHTML = data.map(o=>`<tr>
     <td><b>${o.symbol}</b></td>
-    <td>${tag(o.side,o.side)}</td>
-    <td>${o.order_type}</td>
-    <td>${fmtN(o.quantity)}</td>
-    <td>${o.price?'$'+fmtN(o.price):'-'}</td>
-    <td>${tag(o.status,o.status)}</td>
-    <td style="color:var(--muted)">${o.source_type}</td>
+    <td>${tag(sides[o.side]||o.side,o.side)}</td>
+    <td>${types[o.order_type]||o.order_type}</td>
+    <td>${fmtN(o.quantity)}</td><td>${o.price?'$'+fmtN(o.price):'-'}</td>
+    <td>${tag(statuses[o.status]||o.status,o.status)}</td>
+    <td style="color:var(--muted)">${sources[o.source_type]||o.source_type}</td>
     <td style="color:var(--muted)">${fmtDate(o.created_at)}</td>
   </tr>`).join('')
 }
@@ -551,27 +665,27 @@ async function createOrder() {
   const type = document.getElementById('order-type').value
   const qty = parseFloat(document.getElementById('order-qty').value)
   const price = parseFloat(document.getElementById('order-price').value)||null
-  if(!exc||!sym||!qty){toast('Fill all required fields','error');return}
+  if(!exc||!sym||!qty){toast('Заполните все обязательные поля','error');return}
   try {
     await api('/orders/',{method:'POST',body:JSON.stringify({exchange_id:exc,symbol:sym,side,order_type:type,quantity:qty,price})})
-    toast('Order placed!','success')
-    loadOrders()
+    toast('Ордер размещён!','success'); loadOrders()
   } catch(e){toast(e.message,'error')}
 }
 
-// ---- Signals ----
 function renderSignalsTable(id, sigs) {
   const tb = document.getElementById(id)
-  if(!sigs||!sigs.length){tb.innerHTML='<tr><td colspan="9" class="empty">No signals yet</td></tr>';return}
+  if(!sigs||!sigs.length){tb.innerHTML='<tr><td colspan="9" class="empty">Нет сигналов</td></tr>';return}
+  const dirs = {long:'Лонг',short:'Шорт'}
+  const decs = {APPROVE:'Одобрен',REJECT:'Отклонён',PAPER_ONLY:'Только бумажный',REDUCE_SIZE:'Уменьшить размер',DELAY:'Отложить'}
   tb.innerHTML = sigs.map(s=>`<tr>
     <td><b>${s.symbol}</b></td>
-    <td>${tag(s.direction,s.direction)}</td>
+    <td>${tag(dirs[s.direction]||s.direction,s.direction)}</td>
     <td>${s.entry_min&&s.entry_max?'$'+fmtN(s.entry_min)+' – $'+fmtN(s.entry_max):'-'}</td>
     <td>${s.stop_loss?'$'+fmtN(s.stop_loss):'-'}</td>
-    <td>${Array.isArray(s.take_profits)?s.take_profits.length+' TPs':'0'}</td>
+    <td>${Array.isArray(s.take_profits)?s.take_profits.length+' шт.':'0'}</td>
     <td>${s.leverage?s.leverage+'x':'-'}</td>
     <td>${s.final_score?(s.final_score*100).toFixed(0)+'%':'-'}</td>
-    <td>${s.decision?tag(s.decision.toLowerCase(),s.decision.toLowerCase().replace('_only','').replace('approve','approve').replace('reject','reject').replace('paper','paper')):'-'}</td>
+    <td>${s.decision?tag(decs[s.decision]||s.decision,s.decision.toLowerCase().replace('_only','').replace('approve','approve').replace('reject','reject').replace('paper','paper')):'-'}</td>
     <td style="color:var(--muted)">${fmtDate(s.parsed_at)}</td>
   </tr>`).join('')
 }
@@ -580,39 +694,35 @@ async function loadSignals() {
   const [sigs, lb] = await Promise.all([api('/signals/?limit=100'), api('/signals/leaderboard')])
   if(sigs) renderSignalsTable('signals-table', sigs)
   const lb_tb = document.getElementById('leaderboard-table')
-  if(!lb||!lb.length){lb_tb.innerHTML='<tr><td colspan="6" class="empty">No sources yet</td></tr>';return}
+  if(!lb||!lb.length){lb_tb.innerHTML='<tr><td colspan="6" class="empty">Нет источников</td></tr>';return}
   lb_tb.innerHTML = lb.map((s,i)=>`<tr>
-    <td>${i+1}</td>
-    <td><b>${s.name}</b></td>
-    <td>${(s.win_rate*100).toFixed(1)}%</td>
-    <td>${s.signal_count}</td>
+    <td>${i+1}</td><td><b>${s.name}</b></td>
+    <td>${(s.win_rate*100).toFixed(1)}%</td><td>${s.signal_count}</td>
     <td>${(s.quality_score*100).toFixed(1)}%</td>
-    <td>${s.is_paper_only?tag('paper','paper'):tag('live','approve')}</td>
+    <td>${s.is_paper_only?tag('Бумажный','paper'):tag('Лайв','approve')}</td>
   </tr>`).join('')
 }
 
-// ---- Exchanges ----
 let exchangeList = []
 async function loadExchanges() {
   const [excs, creds] = await Promise.all([api('/exchanges/'), api('/exchanges/credentials')])
   exchangeList = excs||[]
-  // Populate dropdowns
   const opts = exchangeList.map(e=>`<option value="${e.id}">${e.name}</option>`).join('')
-  document.getElementById('cred-exchange').innerHTML = '<option value="">Select Exchange...</option>'+opts
-  document.getElementById('order-exchange').innerHTML = '<option value="">Select Exchange...</option>'+opts
+  document.getElementById('cred-exchange').innerHTML = '<option value="">Выберите биржу...</option>'+opts
+  document.getElementById('order-exchange').innerHTML = '<option value="">Выберите биржу...</option>'+opts
   const tb = document.getElementById('exchanges-table')
-  if(!exchangeList.length){tb.innerHTML='<tr><td colspan="4" class="empty">No exchanges added yet</td></tr>'}
+  const statuses = {true:'Активна',false:'Неактивна'}
+  if(!exchangeList.length){tb.innerHTML='<tr><td colspan="4" class="empty">Нет подключённых бирж</td></tr>'}
   else tb.innerHTML = exchangeList.map(e=>`<tr>
-    <td><b>${e.name}</b></td>
-    <td class="td-mono">${e.adapter_class}</td>
-    <td>${tag(e.is_active?'active':'inactive',e.is_active?'approve':'paper')}</td>
+    <td><b>${e.name}</b></td><td style="color:var(--muted)">${e.adapter_class}</td>
+    <td>${tag(e.is_active?'Активна':'Неактивна',e.is_active?'active':'inactive')}</td>
     <td style="color:var(--muted)">${fmtDate(e.created_at)}</td>
   </tr>`).join('')
   const ct = document.getElementById('creds-table')
-  if(!creds||!creds.length){ct.innerHTML='<tr><td colspan="3" class="empty">No API keys configured</td></tr>'}
+  if(!creds||!creds.length){ct.innerHTML='<tr><td colspan="3" class="empty">API-ключи не добавлены</td></tr>'}
   else ct.innerHTML = creds.map(c=>`<tr>
     <td>${c.exchange_name||c.exchange_id}</td>
-    <td>${tag(c.permissions_verified?'verified':'pending',c.permissions_verified?'approve':'paper')}</td>
+    <td>${tag(c.permissions_verified?'Верифицированы':'Ожидание',c.permissions_verified?'approve':'pending')}</td>
     <td style="color:var(--muted)">${fmtDate(c.created_at)}</td>
   </tr>`).join('')
 }
@@ -621,8 +731,7 @@ async function addExchange() {
   const name = document.getElementById('exc-name').value
   try {
     await api('/exchanges/',{method:'POST',body:JSON.stringify({name,adapter_class:name})})
-    toast(name+' added!','success')
-    loadExchanges()
+    toast(name+' добавлена!','success'); loadExchanges()
   } catch(e){toast(e.message,'error')}
 }
 
@@ -630,35 +739,32 @@ async function addCredential() {
   const exc = document.getElementById('cred-exchange').value
   const key = document.getElementById('cred-key').value
   const sec = document.getElementById('cred-secret').value
-  if(!exc||!key||!sec){toast('Fill all fields','error');return}
+  if(!exc||!key||!sec){toast('Заполните все поля','error');return}
   try {
     await api('/exchanges/credentials',{method:'POST',body:JSON.stringify({exchange_id:exc,api_key:key,api_secret:sec})})
-    toast('API keys saved!','success')
-    document.getElementById('cred-key').value=''
-    document.getElementById('cred-secret').value=''
+    toast('API-ключи сохранены!','success')
+    document.getElementById('cred-key').value=''; document.getElementById('cred-secret').value=''
     loadExchanges()
   } catch(e){toast(e.message,'error')}
 }
 
-// ---- Risk ----
 async function loadRisk() {
   const [events, cfg] = await Promise.all([api('/risk/events?limit=50'), api('/risk/config')])
   const rt = document.getElementById('risk-table')
-  if(!events||!events.length){rt.innerHTML='<tr><td colspan="6" class="empty">No risk events</td></tr>'}
+  const sevMap = {critical:'Критический',warning:'Предупреждение',info:'Информация'}
+  if(!events||!events.length){rt.innerHTML='<tr><td colspan="6" class="empty">Нет событий</td></tr>'}
   else rt.innerHTML = events.map(e=>`<tr>
     <td>${e.event_type}</td>
-    <td>${tag(e.severity,e.severity==='critical'?'reject':e.severity==='warning'?'paper':'approve')}</td>
+    <td>${tag(sevMap[e.severity]||e.severity,e.severity)}</td>
     <td>${e.component||'-'}</td>
-    <td>${tag(e.is_resolved?'yes':'no',e.is_resolved?'approve':'reject')}</td>
+    <td>${tag(e.is_resolved?'Да':'Нет',e.is_resolved?'approve':'reject')}</td>
     <td style="color:var(--muted)">${fmtDate(e.created_at)}</td>
-    <td>${!e.is_resolved?`<button onclick="resolveEvent('${e.id}')" class="refresh-btn">Resolve</button>`:''}</td>
+    <td>${!e.is_resolved?`<button onclick="resolveEvent('${e.id}')" class="refresh-btn">Решить</button>`:''}</td>
   </tr>`).join('')
   const ct = document.getElementById('riskconfig-table')
-  if(!cfg||!cfg.length){ct.innerHTML='<tr><td colspan="4" class="empty">No risk config</td></tr>'}
+  if(!cfg||!cfg.length){ct.innerHTML='<tr><td colspan="4" class="empty">Нет конфигурации</td></tr>'}
   else ct.innerHTML = cfg.map(c=>`<tr>
-    <td>${c.scope||'global'}</td>
-    <td>${c.param_name}</td>
-    <td><b>${c.param_value}</b></td>
+    <td>${c.scope||'global'}</td><td>${c.param_name}</td><td><b>${c.param_value}</b></td>
     <td style="color:var(--muted)">${fmtDate(c.updated_at)}</td>
   </tr>`).join('')
 }
@@ -666,12 +772,65 @@ async function loadRisk() {
 async function resolveEvent(id) {
   try {
     await api(`/risk/events/${id}/resolve`,{method:'PATCH'})
-    toast('Event resolved','success')
-    loadRisk()
+    toast('Событие решено','success'); loadRisk()
   } catch(e){toast(e.message,'error')}
 }
 
-// ---- Init ----
+async function loadSettings() {
+  // Загружаем список бирж для настроек
+  const [excs, creds] = await Promise.all([api('/exchanges/'), api('/exchanges/credentials')])
+  exchangeList = excs||[]
+  const ct = document.getElementById('settings-creds-table')
+  if(!creds||!creds.length){ct.innerHTML='<tr><td colspan="5" class="empty">Нет подключённых бирж</td></tr>'}
+  else ct.innerHTML = creds.map(c=>`<tr>
+    <td><b>${c.exchange_name||c.exchange_id}</b></td>
+    <td>${tag(c.permissions_verified?'Верифицированы':'Ожидание',c.permissions_verified?'approve':'pending')}</td>
+    <td style="color:var(--muted);font-family:monospace">****...****</td>
+    <td style="color:var(--muted)">${fmtDate(c.created_at)}</td>
+    <td></td>
+  </tr>`).join('')
+}
+
+async function settingsAddExchange() {
+  const name = document.getElementById('settings-exc-name').value
+  const key = document.getElementById('settings-api-key').value
+  const sec = document.getElementById('settings-api-secret').value
+  if(!key||!sec){toast('Введите API Key и Secret','error');return}
+  try {
+    // Сначала создаём биржу если её нет
+    let excId = exchangeList.find(e=>e.name===name)?.id
+    if(!excId) {
+      const exc = await api('/exchanges/',{method:'POST',body:JSON.stringify({name,adapter_class:name})})
+      excId = exc.id
+      exchangeList.push(exc)
+    }
+    await api('/exchanges/credentials',{method:'POST',body:JSON.stringify({exchange_id:excId,api_key:key,api_secret:sec})})
+    toast(name+' успешно подключена!','success')
+    document.getElementById('settings-api-key').value=''
+    document.getElementById('settings-api-secret').value=''
+    loadSettings()
+  } catch(e){toast(e.message,'error')}
+}
+
+async function saveRiskSettings() {
+  const params = [
+    {param_name:'max_risk_per_trade', param_value:document.getElementById('risk-per-trade').value},
+    {param_name:'max_daily_drawdown', param_value:document.getElementById('risk-daily-dd').value},
+    {param_name:'max_simultaneous_positions', param_value:document.getElementById('risk-max-pos').value},
+    {param_name:'max_leverage', param_value:document.getElementById('risk-max-lev').value},
+  ]
+  try {
+    await Promise.all(params.map(p=>api('/risk/config',{method:'POST',body:JSON.stringify({scope:'global',...p})})))
+    toast('Параметры риска сохранены!','success')
+  } catch(e){toast(e.message,'error')}
+}
+
+function emergencyStop() {
+  if(confirm('⚠️ Вы уверены? Это отменит ВСЕ ордера и закроет ВСЕ позиции немедленно!')) {
+    toast('Аварийная остановка активирована (функция в разработке)','info')
+  }
+}
+
 if(token) initApp()
 </script>
 </body>
