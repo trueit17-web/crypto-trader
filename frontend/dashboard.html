@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CryptoTrader Dashboard</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f1117;color:#e2e8f0;min-height:100vh}
+:root{--bg:#0f1117;--card:#1a1d2e;--border:#2d3148;--accent:#6366f1;--green:#10b981;--red:#ef4444;--yellow:#f59e0b;--text:#e2e8f0;--muted:#64748b}
+
+/* Auth */
+#auth{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0f1117 0%,#1a1d2e 100%)}
+.auth-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px;width:400px;box-shadow:0 25px 50px rgba(0,0,0,.5)}
+.auth-card h1{text-align:center;font-size:24px;margin-bottom:8px}
+.auth-card p{text-align:center;color:var(--muted);margin-bottom:32px;font-size:14px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+.form-group input{width:100%;background:#0f1117;border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;outline:none;transition:border-color .2s}
+.form-group input:focus{border-color:var(--accent)}
+.btn{width:100%;padding:12px;border-radius:8px;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#4f46e5}
+.auth-tabs{display:flex;gap:8px;margin-bottom:24px;background:#0f1117;border-radius:8px;padding:4px}
+.auth-tab{flex:1;padding:8px;text-align:center;border-radius:6px;cursor:pointer;font-size:13px;color:var(--muted);transition:all .2s}
+.auth-tab.active{background:var(--card);color:var(--text);border:1px solid var(--border)}
+.auth-error{color:var(--red);font-size:13px;text-align:center;margin-top:12px;display:none}
+
+/* Layout */
+#app{display:none;min-height:100vh}
+.sidebar{width:240px;background:var(--card);border-right:1px solid var(--border);position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;padding:20px 0;z-index:100}
+.logo{padding:0 20px 24px;border-bottom:1px solid var(--border);font-size:18px;font-weight:700;color:var(--accent)}
+.logo span{color:var(--text)}
+.nav{padding:16px 12px;flex:1}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:14px;color:var(--muted);transition:all .2s;margin-bottom:4px}
+.nav-item:hover{background:#232640;color:var(--text)}
+.nav-item.active{background:rgba(99,102,241,.15);color:var(--accent)}
+.nav-item .icon{font-size:16px;width:20px;text-align:center}
+.nav-bottom{padding:12px;border-top:1px solid var(--border)}
+.user-info{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font-size:13px}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0}
+.main{margin-left:240px;padding:32px;min-height:100vh}
+.page{display:none}
+.page.active{display:block}
+
+/* Header */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.page-title{font-size:22px;font-weight:700}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.badge-green{background:rgba(16,185,129,.15);color:var(--green)}
+.badge-red{background:rgba(239,68,68,.15);color:var(--red)}
+.badge-yellow{background:rgba(245,158,11,.15);color:var(--yellow)}
+.badge-blue{background:rgba(99,102,241,.15);color:var(--accent)}
+
+/* Cards */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:28px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.card-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.card-value{font-size:28px;font-weight:700}
+.card-value.green{color:var(--green)}
+.card-value.red{color:var(--red)}
+.card-sub{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* Tables */
+.table-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:24px}
+.table-card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.table-card-title{font-size:15px;font-weight:600}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 20px;text-align:left;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:12px 20px;font-size:13px;border-bottom:1px solid var(--border)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.td-mono{font-family:'Courier New',monospace;font-size:12px}
+
+/* Misc */
+.empty{text-align:center;padding:48px;color:var(--muted);font-size:14px}
+.refresh-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;transition:all .2s}
+.refresh-btn:hover{border-color:var(--accent);color:var(--accent)}
+.logout-btn{background:transparent;border:1px solid var(--border);color:var(--muted);padding:6px 12px;border-radius:6px;font-size:12px;cursor:pointer;width:100%;transition:all .2s}
+.logout-btn:hover{border-color:var(--red);color:var(--red)}
+.spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+.tag-long{background:rgba(16,185,129,.15);color:var(--green)}
+.tag-short{background:rgba(239,68,68,.15);color:var(--red)}
+.tag-buy{background:rgba(16,185,129,.15);color:var(--green)}
+.tag-sell{background:rgba(239,68,68,.15);color:var(--red)}
+.tag-open{background:rgba(99,102,241,.15);color:var(--accent)}
+.tag-filled{background:rgba(16,185,129,.15);color:var(--green)}
+.tag-cancelled{background:rgba(100,116,139,.15);color:var(--muted)}
+.tag-approve{background:rgba(16,185,129,.15);color:var(--green)}
+.tag-reject{background:rgba(239,68,68,.15);color:var(--red)}
+.tag-paper{background:rgba(245,158,11,.15);color:var(--yellow)}
+
+/* Form */
+.form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:16px}
+.input-field{background:#0f1117;border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;outline:none;width:100%;transition:border-color .2s}
+.input-field:focus{border-color:var(--accent)}
+select.input-field option{background:var(--card)}
+.btn-sm{padding:8px 16px;border-radius:6px;border:none;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-sm-primary{background:var(--accent);color:#fff}
+.btn-sm-primary:hover{background:#4f46e5}
+
+/* Toast */
+#toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;opacity:0;transition:opacity .3s;z-index:9999}
+#toast.show{opacity:1}
+#toast.success{background:var(--green);color:#fff}
+#toast.error{background:var(--red);color:#fff}
+</style>
+</head>
+<body>
+
+<!-- Auth -->
+<div id="auth">
+  <div class="auth-card">
+    <h1>₿ CryptoTrader</h1>
+    <p>Professional crypto trading platform</p>
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="setTab('login')">Login</div>
+      <div class="auth-tab" onclick="setTab('register')">Register</div>
+    </div>
+    <div id="form-login">
+      <div class="form-group"><label>Email</label><input type="email" id="login-email" placeholder="you@example.com"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="login-pass" placeholder="••••••••"></div>
+      <button class="btn btn-primary" onclick="doLogin()">🔐 Sign In</button>
+    </div>
+    <div id="form-register" style="display:none">
+      <div class="form-group"><label>Email</label><input type="email" id="reg-email" placeholder="you@example.com"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="reg-pass" placeholder="min 8 chars"></div>
+      <button class="btn btn-primary" onclick="doRegister()">🚀 Create Account</button>
+    </div>
+    <div id="auth-error" class="auth-error"></div>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app">
+  <div class="sidebar">
+    <div class="logo">💹 Crypto<span>Trader</span></div>
+    <div class="nav">
+      <div class="nav-item active" onclick="showPage('dashboard')">
+        <span class="icon">📊</span> Dashboard
+      </div>
+      <div class="nav-item" onclick="showPage('portfolio')">
+        <span class="icon">💰</span> Portfolio
+      </div>
+      <div class="nav-item" onclick="showPage('positions')">
+        <span class="icon">📈</span> Positions
+      </div>
+      <div class="nav-item" onclick="showPage('orders')">
+        <span class="icon">📋</span> Orders
+      </div>
+      <div class="nav-item" onclick="showPage('signals')">
+        <span class="icon">⚡</span> Signals
+      </div>
+      <div class="nav-item" onclick="showPage('exchanges')">
+        <span class="icon">🏛️</span> Exchanges
+      </div>
+      <div class="nav-item" onclick="showPage('risk')">
+        <span class="icon">🛡️</span> Risk
+      </div>
+    </div>
+    <div class="nav-bottom">
+      <div class="user-info">
+        <div class="avatar" id="user-avatar">U</div>
+        <div><div id="user-email" style="font-size:12px">user@example.com</div>
+        <div id="user-role" style="font-size:11px;color:var(--muted)">admin</div></div>
+      </div>
+      <button class="logout-btn" onclick="logout()" style="margin-top:8px">🚪 Sign out</button>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- Dashboard -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div class="page-title">📊 Dashboard</div>
+        <button class="refresh-btn" onclick="loadDashboard()">↻ Refresh</button>
+      </div>
+      <div class="cards-grid" id="summary-cards">
+        <div class="card"><div class="card-label">Total Equity</div><div class="card-value" id="s-equity">$0</div></div>
+        <div class="card"><div class="card-label">Unrealized PnL</div><div class="card-value" id="s-upnl">$0</div></div>
+        <div class="card"><div class="card-label">Realized PnL (day)</div><div class="card-value" id="s-rpnl">$0</div></div>
+        <div class="card"><div class="card-label">Open Positions</div><div class="card-value" id="s-pos">0</div></div>
+        <div class="card"><div class="card-label">Active Exchanges</div><div class="card-value" id="s-exc">0</div></div>
+      </div>
+      <div class="table-card">
+        <div class="table-card-header"><div class="table-card-title">📋 Recent Orders</div></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Symbol</th><th>Side</th><th>Type</th><th>Qty</th><th>Price</th><th>Status</th><th>Time</th></tr></thead>
+          <tbody id="dash-orders"><tr><td colspan="7" class="empty">Loading...</td></tr></tbody>
+        </table></div>
+      </div>
+      <div class="table-card">
+        <div class="table-card-header"><div class="table-card-title">⚡ Recent Signals</div></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Symbol</th><th>Direction</th><th>Entry</th><th>SL</th><th>Score</th><th>Decision</th><th>Time</th></tr></thead>
+          <tbody id="dash-signals"><tr><td colspan="7" class="empty">Loading...</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- Portfolio -->
+    <div class="page" id="page-portfolio">
+      <div class="page-header">
+        <div class="page-title">💰 Portfolio</div>
+        <button class="refresh-btn" onclick="loadPortfolio()">↻ Refresh</button>
+      </div>
+      <div class="table-card">
+        <div class="table-card-header"><div class="table-card-title">Balances</div></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Exchange</th><th>Currency</th><th>Total</th><th>Available</th><th>Locked</th><th>Updated</th></tr></thead>
+          <tbody id="balances-table"><tr><td colspan="6" class="empty">Loading...</td></tr></tbody>
+        </table></div>
+      </div>
+      <div class="table-card">
+        <div class="table-card-header"><div class="table-card-title">PnL History (snapshots)</div></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Time</th><th>Total Equity</th><th>Unrealized PnL</th><th>Realized PnL</th></tr></thead>
+          <tbody id="snapshots-table"><tr><td colspan="4" class="empty">No snapshots yet</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- Positions -->
+    <div class="page" id="page-positions">
+      <div class="page-header">
+        <div class="page-title">📈 Open Positions</div>
+        <button class="refresh-btn" onclick="loadPositions()">↻ Refresh</button>
+      </div>
+      <div class="table-card">
+        <div class="table-wrap"><table>
+          <thead><tr><th>Exchange</th><th>Symbol</th><th>Side</th><th>Qty</th><th>Entry</th><th>Leverage</th><th>PnL</th><th>Liq. Price</th><th>Opened</th></tr></thead>
+          <tbody id="positions-table"><tr><td colspan="9" class="empty">Loading...</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- Orders -->
+    <div class="page" id="page-orders">
+      <div class="page-header">
+        <div class="page-title">📋 Orders</div>
+        <button class="refresh-btn" onclick="loadOrders()">↻ Refresh</button>
+      </div>
+      <div class="card" style="margin-bottom:20px">
+        <div style="font-size:14px;font-weight:600;margin-bottom:16px">➕ New Manual Order</div>
+        <div class="form-row">
+          <select class="input-field" id="order-exchange"><option value="">Select Exchange...</option></select>
+          <input class="input-field" id="order-symbol" placeholder="BTC/USDT">
+          <select class="input-field" id="order-side"><option value="buy">Buy</option><option value="sell">Sell</option></select>
+          <select class="input-field" id="order-type"><option value="market">Market</option><option value="limit">Limit</option></select>
+          <input class="input-field" id="order-qty" type="number" placeholder="Quantity">
+          <input class="input-field" id="order-price" type="number" placeholder="Price (limit only)">
+          <button class="btn-sm btn-sm-primary" onclick="createOrder()">Place Order</button>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-wrap"><table>
+          <thead><tr><th>Symbol</th><th>Side</th><th>Type</th><th>Qty</th><th>Price</th><th>Status</th><th>Source</th><th>Time</th></tr></thead>
+          <tbody id="orders-table"><tr><td colspan="8" class="empty">Loading...</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- Signals -->
+    <div class="page" id="page-signals">
+      <div class="page-header">
+        <div class="page-title">⚡ Signals</div>
+        <button class="refresh-btn" onclick="loadSignals()">↻ Refresh</button>
+      </div>
+      <div class="table-card">
+        <div class="table-card-header"><div class="table-card-title">Signal Feed</div></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Symbol</th><th>Direction</th><th>Entry</th><th>Stop Loss</th><th>TPs</th><th>Leverage</th><th>Score</th><th>Decision</th><th>Time</th></tr></thead>
+          <tbody id="signals-table"><tr><td colspan="9" class="empty">Loading...</td></tr></tbody>
+        </table></div>
+      </div>
+      <div class="table-card">
+        <div class="table-card-header"><div class="table-card-title">🏆 Source Leaderboard</div></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>#</th><th>Source</th><th>Win Rate</th><th>Signals</th><th>Quality Score</th><th>Paper Only</th></tr></thead>
+          <tbody id="leaderboard-table"><tr><td colspan="6" class="empty">No sources yet</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- Exchanges -->
+    <div class="page" id="page-exchanges">
+      <div class="page-header">
+        <div class="page-title">🏛️ Exchanges</div>
+        <button class="refresh-btn" onclick="loadExchanges()">↻ Refresh</button>
+      </div>
+      <div class="card" style="margin-bottom:20px">
+        <div style="font-size:14px;font-weight:600;margin-bottom:16px">➕ Add Exchange</div>
+        <div class="form-row">
+          <select class="input-field" id="exc-name">
+            <option value="binance">Binance</option>
+            <option value="bybit">Bybit</option>
+            <option value="okx">OKX</option>
+            <option value="gate">Gate.io</option>
+            <option value="kucoin">KuCoin</option>
+          </select>
+          <button class="btn-sm btn-sm-primary" onclick="addExchange()">Add Exchange</button>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:20px">
+        <div style="font-size:14px;font-weight:600;margin-bottom:16px">🔑 Add API Keys</div>
+        <div class="form-row">
+          <select class="input-field" id="cred-exchange"><option value="">Select Exchange...</option></select>
+          <input class="input-field" id="cred-key" placeholder="API Key">
+          <input class="input-field" id="cred-secret" type="password" placeholder="API Secret">
+          <button class="btn-sm btn-sm-primary" onclick="addCredential()">Save Keys</button>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-card-header"><div class="table-card-title">Connected Exchanges</div></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Name</th><th>Adapter</th><th>Status</th><th>Added</th></tr></thead>
+          <tbody id="exchanges-table"><tr><td colspan="4" class="empty">Loading...</td></tr></tbody>
+        </table></div>
+      </div>
+      <div class="table-card">
+        <div class="table-card-header"><div class="table-card-title">API Keys</div></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Exchange</th><th>Verified</th><th>Added</th></tr></thead>
+          <tbody id="creds-table"><tr><td colspan="3" class="empty">No API keys configured</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- Risk -->
+    <div class="page" id="page-risk">
+      <div class="page-header">
+        <div class="page-title">🛡️ Risk Management</div>
+        <button class="refresh-btn" onclick="loadRisk()">↻ Refresh</button>
+      </div>
+      <div class="table-card">
+        <div class="table-card-header"><div class="table-card-title">Risk Events</div></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Type</th><th>Severity</th><th>Component</th><th>Resolved</th><th>Time</th><th>Action</th></tr></thead>
+          <tbody id="risk-table"><tr><td colspan="6" class="empty">No risk events</td></tr></tbody>
+        </table></div>
+      </div>
+      <div class="table-card">
+        <div class="table-card-header"><div class="table-card-title">Risk Configuration</div></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Scope</th><th>Parameter</th><th>Value</th><th>Updated</th></tr></thead>
+          <tbody id="riskconfig-table"><tr><td colspan="4" class="empty">No risk config</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = ''  // same origin, or set to 'http://144.124.249.215:8000'
+let token = localStorage.getItem('ct_token')
+let currentUser = null
+
+// ---- Auth ----
+function setTab(t) {
+  document.querySelectorAll('.auth-tab').forEach((el,i)=>el.classList.toggle('active',i===(t==='login'?0:1)))
+  document.getElementById('form-login').style.display = t==='login'?'':'none'
+  document.getElementById('form-register').style.display = t==='register'?'':'none'
+  document.getElementById('auth-error').style.display='none'
+}
+
+async function api(path, opts={}) {
+  const headers = {'Content-Type':'application/json'}
+  if(token) headers['Authorization'] = 'Bearer '+token
+  const r = await fetch(API+'/api/v1'+path, {...opts, headers:{...headers,...(opts.headers||{})}})
+  if(r.status===401){logout();return null}
+  const data = await r.json().catch(()=>({}))
+  if(!r.ok) throw new Error(data.detail||'Error '+r.status)
+  return data
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value
+  const pass = document.getElementById('login-pass').value
+  const err = document.getElementById('auth-error')
+  try {
+    const data = await api('/auth/login',{method:'POST',body:JSON.stringify({email,password:pass})})
+    if(!data) return
+    token = data.access_token
+    localStorage.setItem('ct_token', token)
+    await initApp()
+  } catch(e) {
+    err.textContent = e.message; err.style.display='block'
+  }
+}
+
+async function doRegister() {
+  const email = document.getElementById('reg-email').value
+  const pass = document.getElementById('reg-pass').value
+  const err = document.getElementById('auth-error')
+  try {
+    await api('/auth/register',{method:'POST',body:JSON.stringify({email,password:pass})})
+    toast('Account created! Please login.','success')
+    setTab('login')
+    document.getElementById('login-email').value = email
+  } catch(e) {
+    err.textContent = e.message; err.style.display='block'
+  }
+}
+
+function logout() {
+  localStorage.removeItem('ct_token')
+  token = null
+  document.getElementById('app').style.display='none'
+  document.getElementById('auth').style.display='flex'
+}
+
+async function initApp() {
+  try {
+    currentUser = await api('/auth/me')
+    if(!currentUser) return
+    document.getElementById('user-email').textContent = currentUser.email
+    document.getElementById('user-role').textContent = currentUser.role
+    document.getElementById('user-avatar').textContent = currentUser.email[0].toUpperCase()
+    document.getElementById('auth').style.display='none'
+    document.getElementById('app').style.display='block'
+    loadDashboard()
+    loadExchanges()  // preload for order form
+  } catch(e) { logout() }
+}
+
+// ---- Navigation ----
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'))
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'))
+  document.getElementById('page-'+name).classList.add('active')
+  event.currentTarget.classList.add('active')
+  const loaders = {dashboard:loadDashboard,portfolio:loadPortfolio,positions:loadPositions,orders:loadOrders,signals:loadSignals,risk:loadRisk}
+  if(loaders[name]) loaders[name]()
+}
+
+// ---- Utils ----
+function fmt(n,dec=2){return typeof n==='number'?'$'+n.toFixed(dec):'-'}
+function fmtN(n,dec=4){return typeof n==='number'?n.toFixed(dec):'-'}
+function fmtDate(d){if(!d)return '-';const dt=new Date(d);return dt.toLocaleDateString()+' '+dt.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'})}
+function pnlClass(v){return v>0?'green':v<0?'red':''}
+function tag(text,cls){return `<span class="tag tag-${cls}">${text}</span>`}
+function toast(msg,type='success'){const t=document.getElementById('toast');t.textContent=msg;t.className='show '+type;setTimeout(()=>t.className='',3000)}
+
+// ---- Dashboard ----
+async function loadDashboard() {
+  try {
+    const [summary, orders, signals] = await Promise.all([
+      api('/portfolio/summary'),
+      api('/orders/?limit=10'),
+      api('/signals/?limit=10')
+    ])
+    if(summary) {
+      document.getElementById('s-equity').textContent = '$'+summary.total_equity.toFixed(2)
+      const upnl = summary.unrealized_pnl
+      document.getElementById('s-upnl').innerHTML = `<span class="${pnlClass(upnl)}">$${upnl.toFixed(2)}</span>`
+      const rpnl = summary.realized_pnl_day
+      document.getElementById('s-rpnl').innerHTML = `<span class="${pnlClass(rpnl)}">$${rpnl.toFixed(2)}</span>`
+      document.getElementById('s-pos').textContent = summary.open_positions
+      document.getElementById('s-exc').textContent = summary.active_exchanges
+    }
+    if(orders) renderOrdersTable('dash-orders', orders)
+    if(signals) renderSignalsTable('dash-signals', signals)
+  } catch(e) { console.error(e) }
+}
+
+// ---- Portfolio ----
+async function loadPortfolio() {
+  try {
+    const [balances, snaps] = await Promise.all([api('/portfolio/balances'), api('/portfolio/snapshots?limit=20')])
+    const bt = document.getElementById('balances-table')
+    if(!balances||!balances.length){bt.innerHTML='<tr><td colspan="6" class="empty">No balances</td></tr>';return}
+    bt.innerHTML = balances.map(b=>`<tr>
+      <td>${b.exchange_name||b.exchange_id}</td>
+      <td><b>${b.currency}</b></td>
+      <td>${fmtN(b.total,4)}</td>
+      <td>${fmtN(b.available,4)}</td>
+      <td>${fmtN(b.locked,4)}</td>
+      <td style="color:var(--muted)">${fmtDate(b.updated_at)}</td>
+    </tr>`).join('')
+    const st = document.getElementById('snapshots-table')
+    if(!snaps||!snaps.length){st.innerHTML='<tr><td colspan="4" class="empty">No snapshots yet</td></tr>';return}
+    st.innerHTML = snaps.map(s=>`<tr>
+      <td>${fmtDate(s.timestamp)}</td>
+      <td>$${s.total_equity.toFixed(2)}</td>
+      <td class="${pnlClass(s.unrealized_pnl)}">$${s.unrealized_pnl.toFixed(2)}</td>
+      <td class="${pnlClass(s.realized_pnl_day)}">$${s.realized_pnl_day.toFixed(2)}</td>
+    </tr>`).join('')
+  } catch(e) { console.error(e) }
+}
+
+// ---- Positions ----
+async function loadPositions() {
+  try {
+    const data = await api('/portfolio/positions')
+    const tb = document.getElementById('positions-table')
+    if(!data||!data.length){tb.innerHTML='<tr><td colspan="9" class="empty">No open positions</td></tr>';return}
+    tb.innerHTML = data.map(p=>`<tr>
+      <td>${p.exchange_name||p.exchange_id}</td>
+      <td><b>${p.symbol}</b></td>
+      <td>${tag(p.side,p.side)}</td>
+      <td>${fmtN(p.quantity)}</td>
+      <td>$${fmtN(p.entry_price)}</td>
+      <td>${p.leverage}x</td>
+      <td class="${pnlClass(p.unrealized_pnl)}">$${p.unrealized_pnl.toFixed(2)}</td>
+      <td>${p.liquidation_price?'$'+fmtN(p.liquidation_price):'-'}</td>
+      <td style="color:var(--muted)">${fmtDate(p.opened_at)}</td>
+    </tr>`).join('')
+  } catch(e) { console.error(e) }
+}
+
+// ---- Orders ----
+function renderOrdersTable(id, orders) {
+  const tb = document.getElementById(id)
+  if(!orders||!orders.length){tb.innerHTML='<tr><td colspan="8" class="empty">No orders</td></tr>';return}
+  tb.innerHTML = orders.map(o=>`<tr>
+    <td><b>${o.symbol}</b></td>
+    <td>${tag(o.side,o.side)}</td>
+    <td>${o.order_type}</td>
+    <td>${fmtN(o.quantity)}</td>
+    <td>${o.price?'$'+fmtN(o.price):'-'}</td>
+    <td>${tag(o.status,o.status)}</td>
+    <td style="color:var(--muted)">${fmtDate(o.created_at)}</td>
+  </tr>`).join('')
+}
+
+async function loadOrders() {
+  const data = await api('/orders/?limit=100')
+  const tb = document.getElementById('orders-table')
+  if(!data||!data.length){tb.innerHTML='<tr><td colspan="8" class="empty">No orders yet</td></tr>';return}
+  tb.innerHTML = data.map(o=>`<tr>
+    <td><b>${o.symbol}</b></td>
+    <td>${tag(o.side,o.side)}</td>
+    <td>${o.order_type}</td>
+    <td>${fmtN(o.quantity)}</td>
+    <td>${o.price?'$'+fmtN(o.price):'-'}</td>
+    <td>${tag(o.status,o.status)}</td>
+    <td style="color:var(--muted)">${o.source_type}</td>
+    <td style="color:var(--muted)">${fmtDate(o.created_at)}</td>
+  </tr>`).join('')
+}
+
+async function createOrder() {
+  const exc = document.getElementById('order-exchange').value
+  const sym = document.getElementById('order-symbol').value
+  const side = document.getElementById('order-side').value
+  const type = document.getElementById('order-type').value
+  const qty = parseFloat(document.getElementById('order-qty').value)
+  const price = parseFloat(document.getElementById('order-price').value)||null
+  if(!exc||!sym||!qty){toast('Fill all required fields','error');return}
+  try {
+    await api('/orders/',{method:'POST',body:JSON.stringify({exchange_id:exc,symbol:sym,side,order_type:type,quantity:qty,price})})
+    toast('Order placed!','success')
+    loadOrders()
+  } catch(e){toast(e.message,'error')}
+}
+
+// ---- Signals ----
+function renderSignalsTable(id, sigs) {
+  const tb = document.getElementById(id)
+  if(!sigs||!sigs.length){tb.innerHTML='<tr><td colspan="9" class="empty">No signals yet</td></tr>';return}
+  tb.innerHTML = sigs.map(s=>`<tr>
+    <td><b>${s.symbol}</b></td>
+    <td>${tag(s.direction,s.direction)}</td>
+    <td>${s.entry_min&&s.entry_max?'$'+fmtN(s.entry_min)+' – $'+fmtN(s.entry_max):'-'}</td>
+    <td>${s.stop_loss?'$'+fmtN(s.stop_loss):'-'}</td>
+    <td>${Array.isArray(s.take_profits)?s.take_profits.length+' TPs':'0'}</td>
+    <td>${s.leverage?s.leverage+'x':'-'}</td>
+    <td>${s.final_score?(s.final_score*100).toFixed(0)+'%':'-'}</td>
+    <td>${s.decision?tag(s.decision.toLowerCase(),s.decision.toLowerCase().replace('_only','').replace('approve','approve').replace('reject','reject').replace('paper','paper')):'-'}</td>
+    <td style="color:var(--muted)">${fmtDate(s.parsed_at)}</td>
+  </tr>`).join('')
+}
+
+async function loadSignals() {
+  const [sigs, lb] = await Promise.all([api('/signals/?limit=100'), api('/signals/leaderboard')])
+  if(sigs) renderSignalsTable('signals-table', sigs)
+  const lb_tb = document.getElementById('leaderboard-table')
+  if(!lb||!lb.length){lb_tb.innerHTML='<tr><td colspan="6" class="empty">No sources yet</td></tr>';return}
+  lb_tb.innerHTML = lb.map((s,i)=>`<tr>
+    <td>${i+1}</td>
+    <td><b>${s.name}</b></td>
+    <td>${(s.win_rate*100).toFixed(1)}%</td>
+    <td>${s.signal_count}</td>
+    <td>${(s.quality_score*100).toFixed(1)}%</td>
+    <td>${s.is_paper_only?tag('paper','paper'):tag('live','approve')}</td>
+  </tr>`).join('')
+}
+
+// ---- Exchanges ----
+let exchangeList = []
+async function loadExchanges() {
+  const [excs, creds] = await Promise.all([api('/exchanges/'), api('/exchanges/credentials')])
+  exchangeList = excs||[]
+  // Populate dropdowns
+  const opts = exchangeList.map(e=>`<option value="${e.id}">${e.name}</option>`).join('')
+  document.getElementById('cred-exchange').innerHTML = '<option value="">Select Exchange...</option>'+opts
+  document.getElementById('order-exchange').innerHTML = '<option value="">Select Exchange...</option>'+opts
+  const tb = document.getElementById('exchanges-table')
+  if(!exchangeList.length){tb.innerHTML='<tr><td colspan="4" class="empty">No exchanges added yet</td></tr>'}
+  else tb.innerHTML = exchangeList.map(e=>`<tr>
+    <td><b>${e.name}</b></td>
+    <td class="td-mono">${e.adapter_class}</td>
+    <td>${tag(e.is_active?'active':'inactive',e.is_active?'approve':'paper')}</td>
+    <td style="color:var(--muted)">${fmtDate(e.created_at)}</td>
+  </tr>`).join('')
+  const ct = document.getElementById('creds-table')
+  if(!creds||!creds.length){ct.innerHTML='<tr><td colspan="3" class="empty">No API keys configured</td></tr>'}
+  else ct.innerHTML = creds.map(c=>`<tr>
+    <td>${c.exchange_name||c.exchange_id}</td>
+    <td>${tag(c.permissions_verified?'verified':'pending',c.permissions_verified?'approve':'paper')}</td>
+    <td style="color:var(--muted)">${fmtDate(c.created_at)}</td>
+  </tr>`).join('')
+}
+
+async function addExchange() {
+  const name = document.getElementById('exc-name').value
+  try {
+    await api('/exchanges/',{method:'POST',body:JSON.stringify({name,adapter_class:name})})
+    toast(name+' added!','success')
+    loadExchanges()
+  } catch(e){toast(e.message,'error')}
+}
+
+async function addCredential() {
+  const exc = document.getElementById('cred-exchange').value
+  const key = document.getElementById('cred-key').value
+  const sec = document.getElementById('cred-secret').value
+  if(!exc||!key||!sec){toast('Fill all fields','error');return}
+  try {
+    await api('/exchanges/credentials',{method:'POST',body:JSON.stringify({exchange_id:exc,api_key:key,api_secret:sec})})
+    toast('API keys saved!','success')
+    document.getElementById('cred-key').value=''
+    document.getElementById('cred-secret').value=''
+    loadExchanges()
+  } catch(e){toast(e.message,'error')}
+}
+
+// ---- Risk ----
+async function loadRisk() {
+  const [events, cfg] = await Promise.all([api('/risk/events?limit=50'), api('/risk/config')])
+  const rt = document.getElementById('risk-table')
+  if(!events||!events.length){rt.innerHTML='<tr><td colspan="6" class="empty">No risk events</td></tr>'}
+  else rt.innerHTML = events.map(e=>`<tr>
+    <td>${e.event_type}</td>
+    <td>${tag(e.severity,e.severity==='critical'?'reject':e.severity==='warning'?'paper':'approve')}</td>
+    <td>${e.component||'-'}</td>
+    <td>${tag(e.is_resolved?'yes':'no',e.is_resolved?'approve':'reject')}</td>
+    <td style="color:var(--muted)">${fmtDate(e.created_at)}</td>
+    <td>${!e.is_resolved?`<button onclick="resolveEvent('${e.id}')" class="refresh-btn">Resolve</button>`:''}</td>
+  </tr>`).join('')
+  const ct = document.getElementById('riskconfig-table')
+  if(!cfg||!cfg.length){ct.innerHTML='<tr><td colspan="4" class="empty">No risk config</td></tr>'}
+  else ct.innerHTML = cfg.map(c=>`<tr>
+    <td>${c.scope||'global'}</td>
+    <td>${c.param_name}</td>
+    <td><b>${c.param_value}</b></td>
+    <td style="color:var(--muted)">${fmtDate(c.updated_at)}</td>
+  </tr>`).join('')
+}
+
+async function resolveEvent(id) {
+  try {
+    await api(`/risk/events/${id}/resolve`,{method:'PATCH'})
+    toast('Event resolved','success')
+    loadRisk()
+  } catch(e){toast(e.message,'error')}
+}
+
+// ---- Init ----
+if(token) initApp()
+</script>
+</body>
+</html>
