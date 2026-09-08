@@ -15,8 +15,7 @@ depends_on = None
 
 
 def upgrade() -> None:
-    # Enable TimescaleDB extension
-    op.execute('CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE')
+    # pgcrypto есть в стандартном PostgreSQL, timescaledb — нет (убрано)
     op.execute('CREATE EXTENSION IF NOT EXISTS pgcrypto')
 
     # --- users ---
@@ -70,7 +69,7 @@ def upgrade() -> None:
     )
     op.create_unique_constraint('uq_instrument_exchange_symbol_type', 'instruments', ['exchange_id', 'symbol_normalized', 'market_type'])
 
-    # --- candles (TimescaleDB hypertable) ---
+    # --- candles (обычная таблица, без timescaledb) ---
     op.create_table(
         'candles',
         sa.Column('time', sa.DateTime(timezone=True), nullable=False),
@@ -85,9 +84,10 @@ def upgrade() -> None:
         sa.Column('quote_volume', sa.Numeric(30, 8), nullable=False),
         sa.PrimaryKeyConstraint('time', 'exchange_id', 'symbol', 'timeframe'),
     )
-    op.execute("SELECT create_hypertable('candles', 'time', if_not_exists => TRUE)")
+    op.create_index('ix_candles_time', 'candles', ['time'])
+    op.create_index('ix_candles_symbol_timeframe', 'candles', ['symbol', 'timeframe'])
 
-    # --- funding_rates ---
+    # --- funding_rates (обычная таблица, без timescaledb) ---
     op.create_table(
         'funding_rates',
         sa.Column('time', sa.DateTime(timezone=True), nullable=False),
@@ -96,7 +96,7 @@ def upgrade() -> None:
         sa.Column('rate', sa.Numeric(20, 10), nullable=False),
         sa.PrimaryKeyConstraint('time', 'exchange_id', 'symbol'),
     )
-    op.execute("SELECT create_hypertable('funding_rates', 'time', if_not_exists => TRUE)")
+    op.create_index('ix_funding_rates_time', 'funding_rates', ['time'])
 
     # --- telegram_sources ---
     op.create_table(
@@ -319,7 +319,6 @@ def upgrade() -> None:
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text("timezone('UTC', now())")),
     )
     op.create_index('ix_audit_events_created_at', 'audit_events', ['created_at'], postgresql_using='brin')
-    # Protect audit_events from UPDATE/DELETE
     op.execute("""
         CREATE OR REPLACE FUNCTION prevent_audit_modification()
         RETURNS TRIGGER LANGUAGE plpgsql AS $$
