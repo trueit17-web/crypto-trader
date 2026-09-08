@@ -28,7 +28,7 @@ def utcnow():
 class User(Base):
     __tablename__ = 'users'
 
-    id:            Mapped[str]  = mapped_column(String(36), primary_key=True, default=new_uuid)
+    id:            Mapped[str]  = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
     email:         Mapped[str]  = mapped_column(String(255), unique=True, nullable=False)
     password_hash: Mapped[str]  = mapped_column(String(255), nullable=False)
     totp_secret:   Mapped[Optional[str]] = mapped_column(String(64))
@@ -40,7 +40,7 @@ class User(Base):
 class ApiKey(Base):
     __tablename__ = 'api_keys'
 
-    id:           Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    id:           Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
     user_id:      Mapped[str] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'))
     key_hash:     Mapped[str] = mapped_column(String(128), nullable=False)
     permissions:  Mapped[list] = mapped_column(JSONB, default=list)
@@ -52,7 +52,7 @@ class ApiKey(Base):
 class Session(Base):
     __tablename__ = 'sessions'
 
-    id:                 Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    id:                 Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
     user_id:            Mapped[str] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'))
     refresh_token_hash: Mapped[str] = mapped_column(String(128), nullable=False)
     ip_address:         Mapped[Optional[str]] = mapped_column(String(45))
@@ -66,7 +66,7 @@ class Session(Base):
 class Exchange(Base):
     __tablename__ = 'exchanges'
 
-    id:            Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    id:            Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
     name:          Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     adapter_class: Mapped[str] = mapped_column(String(100), nullable=False)
     config_json:   Mapped[dict] = mapped_column(JSONB, default=dict)
@@ -77,7 +77,7 @@ class Exchange(Base):
 class ExchangeCredential(Base):
     __tablename__ = 'exchange_credentials'
 
-    id:                   Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    id:                   Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
     user_id:              Mapped[str] = mapped_column(ForeignKey('users.id', ondelete='CASCADE'))
     exchange_id:          Mapped[str] = mapped_column(ForeignKey('exchanges.id', ondelete='CASCADE'))
     encrypted_api_key:    Mapped[str] = mapped_column(Text, nullable=False)
@@ -89,7 +89,7 @@ class ExchangeCredential(Base):
 class Instrument(Base):
     __tablename__ = 'instruments'
 
-    id:               Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    id:               Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
     exchange_id:      Mapped[str] = mapped_column(ForeignKey('exchanges.id', ondelete='CASCADE'))
     symbol_normalized:Mapped[str] = mapped_column(String(30), nullable=False)
     symbol_native:    Mapped[str] = mapped_column(String(30), nullable=False)
@@ -135,7 +135,7 @@ class FundingRate(Base):
 class TelegramSource(Base):
     __tablename__ = 'telegram_sources'
 
-    id:            Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    id:            Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
     name:          Mapped[str] = mapped_column(String(255), nullable=False)
     channel_id:    Mapped[int] = mapped_column(BigInteger, unique=True, nullable=False)
     is_authorized: Mapped[bool] = mapped_column(Boolean, default=False)
@@ -149,7 +149,7 @@ class TelegramSource(Base):
 class RawMessage(Base):
     __tablename__ = 'raw_messages'
 
-    id:           Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    id:           Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
     source_id:    Mapped[str] = mapped_column(ForeignKey('telegram_sources.id', ondelete='CASCADE'))
     message_id:   Mapped[int] = mapped_column(BigInteger, nullable=False)
     chat_id:      Mapped[int] = mapped_column(BigInteger, nullable=False)
@@ -163,7 +163,7 @@ class RawMessage(Base):
 class ParsedSignal(Base):
     __tablename__ = 'parsed_signals'
 
-    id:             Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    id:             Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
     raw_message_id: Mapped[str] = mapped_column(ForeignKey('raw_messages.id', ondelete='CASCADE'))
     symbol:         Mapped[str] = mapped_column(String(30), nullable=False)
     direction:      Mapped[str] = mapped_column(String(10), nullable=False)
@@ -180,7 +180,7 @@ class ParsedSignal(Base):
 class SignalScore(Base):
     __tablename__ = 'signal_scores'
 
-    id:               Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    id:               Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
     parsed_signal_id: Mapped[str] = mapped_column(ForeignKey('parsed_signals.id', ondelete='CASCADE'))
     source_score:     Mapped[float] = mapped_column(DECIMAL(4, 3))
     signal_score:     Mapped[float] = mapped_column(DECIMAL(4, 3))
@@ -199,7 +199,7 @@ class SignalScore(Base):
 class Strategy(Base):
     __tablename__ = 'strategies'
 
-    id:          Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    id:          Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
     name:        Mapped[str] = mapped_column(String(100), nullable=False)
     class_name:  Mapped[str] = mapped_column(String(100), nullable=False)
     config_json: Mapped[dict] = mapped_column(JSONB, default=dict)
@@ -215,7 +215,7 @@ class Strategy(Base):
 class Order(Base):
     __tablename__ = 'orders'
 
-    id:                 Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    id:                 Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
     client_order_id:    Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
     exchange_order_id:  Mapped[Optional[str]] = mapped_column(String(64))
     exchange_id:        Mapped[str] = mapped_column(ForeignKey('exchanges.id'))
@@ -237,7 +237,7 @@ class Order(Base):
 class Fill(Base):
     __tablename__ = 'fills'
 
-    id:           Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    id:           Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
     order_id:     Mapped[str] = mapped_column(ForeignKey('orders.id', ondelete='CASCADE'))
     fill_id:      Mapped[str] = mapped_column(String(64), nullable=False)
     price:        Mapped[Decimal] = mapped_column(DECIMAL(24, 8), nullable=False)
@@ -254,7 +254,7 @@ class Fill(Base):
 class Position(Base):
     __tablename__ = 'positions'
 
-    id:                Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    id:                Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
     exchange_id:       Mapped[str] = mapped_column(ForeignKey('exchanges.id'))
     symbol:            Mapped[str] = mapped_column(String(30), nullable=False)
     side:              Mapped[str] = mapped_column(String(5), nullable=False)
@@ -271,7 +271,7 @@ class Position(Base):
 class Balance(Base):
     __tablename__ = 'balances'
 
-    id:          Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    id:          Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
     exchange_id: Mapped[str] = mapped_column(ForeignKey('exchanges.id'))
     currency:    Mapped[str] = mapped_column(String(10), nullable=False)
     total:       Mapped[Decimal] = mapped_column(DECIMAL(24, 8), default=0)
@@ -283,7 +283,7 @@ class Balance(Base):
 class PortfolioSnapshot(Base):
     __tablename__ = 'portfolio_snapshots'
 
-    id:               Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    id:               Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
     timestamp:        Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=utcnow())
     total_equity:     Mapped[Decimal] = mapped_column(DECIMAL(24, 4))
     unrealized_pnl:   Mapped[Decimal] = mapped_column(DECIMAL(20, 4), default=0)
@@ -297,7 +297,7 @@ class PortfolioSnapshot(Base):
 class RiskEventModel(Base):
     __tablename__ = 'risk_events'
 
-    id:          Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    id:          Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
     event_type:  Mapped[str] = mapped_column(String(50), nullable=False)
     severity:    Mapped[str] = mapped_column(String(10), nullable=False)
     component:   Mapped[Optional[str]] = mapped_column(String(50))
@@ -309,7 +309,7 @@ class RiskEventModel(Base):
 class RiskConfig(Base):
     __tablename__ = 'risk_config'
 
-    id:          Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    id:          Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
     scope:       Mapped[Optional[str]] = mapped_column(String(20))
     scope_id:    Mapped[Optional[str]] = mapped_column(String(36))
     param_name:  Mapped[str] = mapped_column(String(60), nullable=False)
@@ -324,7 +324,7 @@ class RiskConfig(Base):
 class MlModel(Base):
     __tablename__ = 'ml_models'
 
-    id:             Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    id:             Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
     name:           Mapped[str] = mapped_column(String(100), nullable=False)
     version:        Mapped[str] = mapped_column(String(20), nullable=False)
     algorithm:      Mapped[Optional[str]] = mapped_column(String(50))
@@ -338,7 +338,7 @@ class MlModel(Base):
 class BacktestRun(Base):
     __tablename__ = 'backtest_runs'
 
-    id:           Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    id:           Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
     strategy_id:  Mapped[Optional[str]] = mapped_column(ForeignKey('strategies.id'))
     model_id:     Mapped[Optional[str]] = mapped_column(ForeignKey('ml_models.id'))
     from_date:    Mapped[datetime] = mapped_column(DateTime(timezone=True))
@@ -355,7 +355,7 @@ class BacktestRun(Base):
 class AuditEvent(Base):
     __tablename__ = 'audit_events'
 
-    id:          Mapped[str] = mapped_column(String(36), primary_key=True, default=new_uuid)
+    id:          Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_uuid)
     event_type:  Mapped[str] = mapped_column(String(60), nullable=False)
     actor_id:    Mapped[Optional[str]] = mapped_column(String(36))
     component:   Mapped[str] = mapped_column(String(50))
